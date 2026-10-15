@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How I Passed GREM in a Month with Self-Study — 0bsh3ll</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0b0d10;--surface:#12151a;--header-bg:rgba(11,13,16,0.92);--border:#22262c;--accent:#7c6cf0;--category:#f472b6;--category-glow:rgba(244,114,182,0.07);--category-border:rgba(244,114,182,0.35);--text:#cbd0d6;--heading:#f5f5f7;--post-title:#eceef1;--muted:#6b7280;--grid-line:rgba(124,108,240,0.03);--sans:'Syne',sans-serif;--code-font:'SF Mono','Fira Code','Cascadia Code',monospace;}
+    :root.light{--bg:#f2f1ed;--surface:#fafaf7;--header-bg:rgba(242,241,237,0.92);--border:#dcdad3;--accent:#4f46e5;--category:#be185d;--category-glow:rgba(190,24,93,0.06);--category-border:rgba(190,24,93,0.3);--text:#2f343b;--heading:#0f1117;--post-title:#111827;--muted:#666b72;--grid-line:rgba(79,70,229,0.035);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);transition:background .3s,color .3s;}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+    header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:var(--header-bg);backdrop-filter:blur(12px);transition:background .3s,border-color .3s;}
+    .logo{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--text);letter-spacing:2px;text-decoration:none;}
+    .logo span{color:var(--accent);}
+    .header-right{display:flex;align-items:center;gap:1rem;}
+    .back-btn{font-family:var(--sans);font-size:0.75rem;font-weight:600;letter-spacing:1px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:0.4rem 1rem;transition:all .2s;}
+    .back-btn:hover{color:var(--accent);border-color:var(--accent);}
+    .theme-toggle{background:none;border:1px solid var(--border);cursor:pointer;padding:0.35rem 0.6rem;font-size:0.9rem;color:var(--muted);transition:all .2s;}
+    .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+    .article-hero{position:relative;z-index:10;max-width:800px;margin:0 auto;padding:4rem 2rem 2rem;animation:fadeUp .5s ease both;}
+    .article-tag{display:inline-block;font-family:var(--sans);font-size:0.7rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--category);border:1px solid var(--category-border);padding:0.3rem 0.8rem;margin-bottom:1.5rem;}
+    .article-title{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;line-height:1.1;color:var(--heading);margin-bottom:1rem;transition:color .3s;}
+    .article-meta{font-family:var(--sans);font-size:0.78rem;color:var(--muted);display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:2rem;}
+    .article-summary{font-family:var(--sans);font-size:0.92rem;color:var(--text);line-height:1.8;border-left:3px solid var(--category);padding:1rem 1.2rem;background:var(--category-glow);}
+    .specs-bar{position:relative;z-index:10;max-width:800px;margin:0 auto;padding:0 2rem 2rem;animation:fadeUp .5s .1s ease both;}
+    .specs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;border:1px solid var(--border);background:var(--border);}
+    .spec-item{padding:0.8rem 1rem;background:var(--surface);}
+    .spec-label{font-family:var(--sans);font-size:0.65rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;}
+    .spec-value{font-family:var(--sans);font-size:0.85rem;font-weight:600;color:var(--category);}
+    .article-body{position:relative;z-index:10;max-width:800px;margin:0 auto;padding:0 2rem 6rem;animation:fadeUp .5s .15s ease both;}
+    .section-heading{font-family:var(--sans);font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--category);margin:3rem 0 1rem;display:flex;align-items:center;gap:0.8rem;}
+    .section-heading::after{content:'';flex:1;height:1px;background:var(--border);}
+    h2{font-size:1.4rem;font-weight:700;color:var(--heading);margin:2.5rem 0 1rem;transition:color .3s;}
+    h3{font-size:1.1rem;font-weight:700;color:var(--post-title);margin:2rem 0 0.8rem;}
+    p{font-family:var(--sans);font-size:0.95rem;color:var(--text);line-height:1.85;margin-bottom:1.2rem;}
+    code{font-family:var(--code-font);font-size:0.85em;background:var(--category-glow);color:var(--category);padding:0.1rem 0.4rem;border:1px solid var(--category-border);}
+    .callout{display:flex;gap:1rem;padding:1rem 1.2rem;margin:1.5rem 0;border:1px solid var(--border);font-family:var(--sans);font-size:0.88rem;line-height:1.7;}
+    .callout-tip{border-left:3px solid var(--category);background:var(--category-glow);color:var(--text);}
+    .callout-info{border-left:3px solid #3b82f6;background:rgba(59,130,246,0.06);color:var(--text);}
+    .callout-warning{border-left:3px solid #f59e0b;background:rgba(245,158,11,0.06);color:var(--text);}
+    .step-num{color:var(--category);margin-right:0.4rem;}
+    [id]{scroll-margin-top:80px;}
+    .callout-icon{font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
+    .checklist{list-style:none;margin:1.5rem 0;}
+    .checklist li{font-family:var(--sans);font-size:0.88rem;color:var(--text);padding:0.6rem 0 0.6rem 2rem;border-bottom:1px solid var(--border);position:relative;line-height:1.6;}
+    .checklist li::before{content:'☐';position:absolute;left:0;color:var(--category);}
+    .article-tags{display:flex;gap:0.5rem;flex-wrap:wrap;margin:3rem 0 1rem;}
+    .article-tags span{font-family:var(--sans);font-size:0.7rem;letter-spacing:1px;color:var(--muted);border:1px solid var(--border);padding:0.2rem 0.6rem;text-transform:uppercase;}
+    .post-nav{display:flex;justify-content:space-between;gap:1rem;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);}
+    .post-nav a{font-family:var(--sans);font-size:0.8rem;color:var(--muted);text-decoration:none;padding:0.6rem 1rem;border:1px solid var(--border);transition:all .2s;max-width:45%;}
+    .post-nav a:hover{color:var(--accent);border-color:var(--accent);}
+    .post-nav .nav-label{font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:0.3rem;}
+    .post-nav .nav-title{color:var(--post-title);}
+    .article-summary a,.spec-value a,.article-body p a,.checklist a,.callout a{color:var(--category);text-decoration:underline;text-underline-offset:3px;}
+    .article-summary a:hover,.spec-value a:hover,.article-body p a:hover,.checklist a:hover,.callout a:hover{color:var(--accent);}
+    @media (max-width:600px){header{padding:0 1rem;}.article-hero,.specs-bar,.article-body{padding-left:1rem;padding-right:1rem;}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="../index.html">&gt; 0b<span>sh3ll</span>_</a>
+    <div class="header-right">
+      <a class="back-btn" href="../index.html">← Back</a>
+      <button class="theme-toggle" onclick="toggleTheme()" id="ti">☀️</button>
+    </div>
+  </header>
+
+  <div class="article-hero">
+    <div class="article-tag">🎓 Certifications</div>
+    <h1 class="article-title">How I Passed GREM in a Month with Self-Study</h1>
+    <div class="article-meta">
+      <span>📅 2026-10-09</span>
+      <span>⏱ 7 min read</span>
+      <span>🛡 GIAC GREM</span>
+    </div>
+    <div class="article-summary">
+      Developer turned security analyst. I cleared the <a href="https://www.giac.org/certifications/reverse-engineering-malware-grem" target="_blank" rel="noopener">GIAC Reverse Engineering Malware (GREM)</a> exam with 87% (passing is 73%) after roughly a month of preparation. I used a lot of free online material, one optional paid course that sped things up, 2 GIAC practice tests and 1 exam attempt. This is the step-by-step method I followed and every resource I used, for anyone looking for a place to start.
+    </div>
+  </div>
+
+  <div class="specs-bar">
+    <div class="specs-grid">
+      <div class="spec-item"><div class="spec-label">Certification</div><div class="spec-value"><a href="https://www.giac.org/certifications/reverse-engineering-malware-grem" target="_blank" rel="noopener">GIAC GREM ↗</a></div></div>
+      <div class="spec-item"><div class="spec-label">My Score</div><div class="spec-value">87%</div></div>
+      <div class="spec-item"><div class="spec-label">Passing Score</div><div class="spec-value">73%</div></div>
+      <div class="spec-item"><div class="spec-label">Prep Time</div><div class="spec-value">~1 month</div></div>
+      <div class="spec-item"><div class="spec-label">Practice Test 1</div><div class="spec-value">56%</div></div>
+      <div class="spec-item"><div class="spec-label">Practice Test 2</div><div class="spec-value">99%</div></div>
+      <div class="spec-item"><div class="spec-label">Course</div><div class="spec-value"><a href="https://academy.intelliroot.com/" target="_blank" rel="noopener">Intelliroot ↗</a></div></div>
+      <div class="spec-item"><div class="spec-label">From GIAC</div><div class="spec-value">2 practice tests + 1 attempt</div></div>
+    </div>
+  </div>
+
+  <div class="article-body">
+
+    <div class="section-heading">01 — Why GREM</div>
+    <p>I'm a developer turned security analyst. While working as an analyst, I found malware analysis to be a really cool topic. Understanding how malware works and learning to identify it felt genuinely interesting, so I started spending extra time after my shifts digging deeper. GREM stood out as a good certification to cement that understanding.</p>
+
+    <div class="section-heading">02 — Where I Started</div>
+    <p>I wouldn't say it was all free. To feed my curiosity, I bought the <a href="https://academy.intelliroot.com/" target="_blank" rel="noopener">Malware Reverse Engineering &amp; Detection Engineering</a> course from Intelliroot Academy. It gave me a strong foundation.</p>
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <span><b>Why self-study?</b> Preparing with the official SANS course (FOR610) is a lot easier, but I couldn't afford it. This exam was self-funded, so on my budget I made the choice to go the self-study route. The Intelliroot course helped me speed up my learning, and I recommend it because it teaches a lot more than what's needed for the GREM exam. Still, you can do all of this with just the free materials I've listed in this post.</span>
+    </div>
+    <p>Even before that, I found some awesome free content that gave me a good grasp of assembly and the stack. Those links are under <a href="#resources">Fundamentals in 04 — Online Resources</a>.</p>
+
+    <div class="section-heading">03 — My Method, Step by Step</div>
+
+    <h3><span class="step-num">1.</span> Know exactly what the exam covers</h3>
+    <p>The first objective is to understand what you need to learn for the exam. GIAC states clearly what you need to be good at. Go to the <a href="https://www.giac.org/certifications/reverse-engineering-malware-grem" target="_blank" rel="noopener">GREM certification page</a> and open the <b>Objectives</b> tab.</p>
+
+    <h3><span class="step-num">2.</span> Find materials and tools for each objective</h3>
+    <p>Next, identify the materials and tools you can use to learn each objective. I've listed the ones I used in <a href="#resources">04 — Online Resources</a>.</p>
+
+    <h3><span class="step-num">3.</span> Build an isolated lab</h3>
+    <p>Never analyse malware on your own machine. Build an isolated lab first. <a href="https://www.youtube.com/watch?v=jLhHc_m0TE4" target="_blank" rel="noopener">This video</a> is a good place to start. While you set it up, pick your disassembler and debugger (see <a href="#resources">Tools in 04</a>).</p>
+
+    <h3><span class="step-num">4.</span> Collect samples and put in the hours</h3>
+    <p>Look for malware on MalwareBazaar and the other sources below, and find samples from every category in the objectives. There's no easy way here: you have to put in the time. My course helped me get some samples, but you can easily get them from the sites I've listed.</p>
+
+    <h3><span class="step-num">5.</span> Take your first practice test</h3>
+    <p>Once you start getting comfortable, buy a practice test from GIAC. It shows you how they ask questions and how much time you get. It also tells you which disassemblers, debuggers and other tools the lab environment supports. I failed my first one with <b>56%</b>, but it showed me my weaknesses and the types of questions they ask.</p>
+
+    <h3><span class="step-num">6.</span> Fix your weak spots</h3>
+    <p>Use those tools and prepare again. If you don't understand something or get stuck, GenAI, YouTube and Reddit become your best friends. This is also when you build your index (see <a href="#index">05</a>).</p>
+    <div class="callout callout-warning">
+      <span class="callout-icon">⚠️</span>
+      <span><b>Use GenAI only to learn concepts.</b> Never paste GIAC exam or practice test questions into ChatGPT or any other AI tool, forum or study site. It's against the <a href="https://www.giac.org/policies/exam-integrity" target="_blank" rel="noopener">GIAC Exam Integrity Policy</a>, and it can get your certification revoked.</span>
+    </div>
+
+    <h3><span class="step-num">7.</span> Take the second practice test</h3>
+    <p>When you're ready, attempt the next practice test. A score of <b>85+</b> is a good sign that you're ready. I scored <b>99%</b> on my second one. I was more than thrilled.</p>
+
+    <h3><span class="step-num">8.</span> One more week, then the real thing</h3>
+    <p>One more week of practice, and then I sat the GREM exam.</p>
+
+    <div class="section-heading" id="resources">04 — Online Resources</div>
+    <p>Everything below is available online. Most of it is free.</p>
+
+    <h3>Fundamentals &amp; practice</h3>
+    <ul class="checklist">
+      <li><a href="https://0xinfection.xyz/reversing/" target="_blank" rel="noopener">0xinfection — Reversing</a>: assembly</li>
+      <li><a href="https://phrack.org/issues/49/smashing-the-stack-for-fun-and-profit_md" target="_blank" rel="noopener">Phrack 49 — Smashing the Stack for Fun and Profit</a>: the stack</li>
+      <li><a href="https://crackmes.one/" target="_blank" rel="noopener">crackmes.one</a>: practice binaries to reverse</li>
+    </ul>
+
+    <h3>Malware samples</h3>
+    <ul class="checklist">
+      <li><a href="https://bazaar.abuse.ch/browse/" target="_blank" rel="noopener">MalwareBazaar</a></li>
+      <li><a href="https://malshare.com/" target="_blank" rel="noopener">MalShare</a></li>
+      <li><a href="https://virusshare.com/" target="_blank" rel="noopener">VirusShare</a>: a good collection of samples that are hard to find elsewhere (registration required)</li>
+    </ul>
+
+    <h3>Tools</h3>
+    <ul class="checklist">
+      <li><b>Office documents:</b> most of the tools you need are on <a href="https://blog.didierstevens.com/" target="_blank" rel="noopener">Didier Stevens' blog</a></li>
+      <li><b>Disassemblers:</b> <a href="https://binary.ninja/" target="_blank" rel="noopener">Binary Ninja</a>, <a href="https://hex-rays.com/ida-free" target="_blank" rel="noopener">IDA</a> or <a href="https://ghidra-sre.org/" target="_blank" rel="noopener">Ghidra</a></li>
+      <li><b>Debuggers:</b> <a href="https://learn.microsoft.com/windows-hardware/drivers/debugger/" target="_blank" rel="noopener">WinDbg</a>, <a href="https://www.ollydbg.de/" target="_blank" rel="noopener">OllyDbg</a> or <a href="https://x64dbg.com/" target="_blank" rel="noopener">x64dbg</a></li>
+    </ul>
+    <p>Pick a disassembler and a debugger from these when you set up your lab.</p>
+
+    <h3>Lab</h3>
+    <ul class="checklist">
+      <li><a href="https://www.youtube.com/watch?v=jLhHc_m0TE4" target="_blank" rel="noopener">Building an isolated analysis lab</a> (video)</li>
+    </ul>
+
+    <div class="section-heading" id="index">05 — Building the Index</div>
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <span>When you build your index, order it by the <a href="https://www.giac.org/certifications/reverse-engineering-malware-grem" target="_blank" rel="noopener">GIAC objectives</a>. In the exam, you'll know exactly where to look.</span>
+    </div>
+    <p>I struggled to remember the flags for each tool, so I printed the help and usage pages for all of them and brought them along with my index. I was even crazy enough to print all the Windows APIs for the exam.</p>
+
+    <div class="section-heading">06 — The Practice Tests</div>
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <span><b>Exam format (at the time of writing):</b> 66 questions in 3 hours, including hands-on CyberLive lab questions. The labs take much longer than the multiple-choice questions, so time is of the essence and you really have to conserve it.</span>
+    </div>
+    <p><b>Practice test 1, 56% (failed):</b> this showed me my weaknesses, the types of questions they ask, and which tools the lab environment supports.</p>
+    <p><b>Practice test 2, 99%:</b> after fixing my weak spots, I was confident. If you're scoring 85+, you're ready.</p>
+
+    <div class="section-heading">07 — Exam Day Tips</div>
+    <p>The real exam was a bit more confusing than the practice tests.</p>
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <span><b>When in doubt, skip it.</b> I skipped the questions I wasn't sure about and came back to them near the end of the exam. It really saves time, and otherwise you get stuck. Highly recommended.</span>
+    </div>
+
+    <div class="section-heading">08 — Result</div>
+    <p>Passed with <b>87%</b> against a passing score of 73%, on 9 October 2026. The whole thing took roughly a month.</p>
+    <p>This note is for anyone looking for a place to start preparing for GREM, or any other exam. It's a method that's tried, tested and works.</p>
+    <p>Reach out to me any time you're struggling, on <a href="https://www.linkedin.com/in/0bsh3ll/" target="_blank" rel="noopener">LinkedIn</a> or <a href="https://github.com/0bsh3ll" target="_blank" rel="noopener">GitHub</a>. A lot of people helped me on this journey, and I'd like to return the favour.</p>
+
+    <div class="article-tags">
+      <span>certs</span><span>grem</span><span>giac</span><span>malware</span><span>self-study</span>
+    </div>
+
+    <div class="post-nav">
+      <a href="../ai/loki.html"><span class="nav-label">← Previous</span><span class="nav-title">Loki — Local AI Agent</span></a>
+    </div>
+  </div>
+
+  <script>
+    const root=document.documentElement,ti=document.getElementById('ti');
+    if(localStorage.getItem('theme')==='light'){root.classList.add('light');ti.textContent='🌙';}
+    function toggleTheme(){const l=root.classList.toggle('light');ti.textContent=l?'🌙':'☀️';localStorage.setItem('theme',l?'light':'dark');}
+  </script>
+</body>
+</html>

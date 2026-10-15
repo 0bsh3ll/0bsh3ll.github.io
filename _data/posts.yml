@@ -1,0 +1,13 @@
+- tag: certs
+  tag_label: Certifications
+  date: "2026-10-09"
+  title: "How I Passed GREM in a Month with Self-Study"
+  excerpt: "Developer turned security analyst. One month, one course, free online resources and 2 GIAC practice tests. 56% on my first practice test → 87% on the real exam. My step-by-step method and every resource I used."
+  url: "certs/grem-self-study.html"
+
+- tag: ai
+  tag_label: "AI &amp; Automation"
+  date: "2025-04-29"
+  title: "Loki — A Local AI Agent That Actually Does Things"
+  excerpt: "A ~200-line Python CLI agent harness that wraps a local Ollama model with real tools — file I/O, web search, code editing. No cloud, no API keys."
+  url: "ai/loki.html"

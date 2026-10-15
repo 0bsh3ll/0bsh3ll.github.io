@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>POST TITLE — 0bsh3ll</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080b0f; --surface:#0d1117; --border:#1e2a38;
+      --accent:#c084fc; --text:#c9d1d9; --muted:#4a5568;
+      --mono:'Share Tech Mono',monospace; --sans:'Syne',sans-serif;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 4px);pointer-events:none;z-index:100;}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(192,132,252,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(192,132,252,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+    header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,11,15,0.92);backdrop-filter:blur(12px);}
+    .logo{font-family:var(--mono);font-size:1rem;color:var(--accent);letter-spacing:2px;text-decoration:none;}
+    .back{font-family:var(--mono);font-size:0.72rem;color:var(--muted);text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:color 0.2s;}
+    .back:hover{color:var(--accent);}
+    .back::before{content:'← ';}
+
+    .hero{position:relative;z-index:10;max-width:780px;margin:0 auto;padding:4rem 2rem 2.5rem;animation:fadeUp 0.5s ease both;}
+    .tag-pill{display:inline-block;font-family:var(--mono);font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);border:1px solid rgba(192,132,252,0.35);padding:0.25rem 0.75rem;margin-bottom:1.5rem;}
+    h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#e6edf3;line-height:1.15;margin-bottom:1rem;}
+    .meta-row{display:flex;gap:2rem;flex-wrap:wrap;font-family:var(--mono);font-size:0.7rem;color:var(--muted);border-top:1px solid var(--border);padding-top:1rem;margin-top:1.5rem;}
+
+    .abstract-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.5rem;margin:2.5rem 0;font-size:0.9rem;color:var(--text);line-height:1.9;font-style:italic;}
+    .abstract-box .abstract-label{font-family:var(--mono);font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem;font-style:normal;}
+
+    .content{position:relative;z-index:10;max-width:780px;margin:0 auto;padding:0 2rem 6rem;animation:fadeUp 0.5s 0.1s ease both;}
+    .content h2{font-size:0.85rem;font-weight:700;color:#e6edf3;margin:3rem 0 1rem;padding-left:1rem;border-left:2px solid var(--accent);font-family:var(--mono);letter-spacing:3px;text-transform:uppercase;}
+    .content h3{font-size:0.9rem;font-weight:700;color:var(--accent);margin:2rem 0 0.75rem;font-family:var(--mono);}
+    .content p{font-size:0.95rem;color:var(--text);margin-bottom:1.2rem;line-height:1.85;}
+    .content a{color:var(--accent);text-decoration:none;}
+    .content a:hover{text-decoration:underline;}
+    .content ul,ol{padding-left:1.5rem;font-size:0.9rem;color:var(--text);line-height:2.2;margin-bottom:1.2rem;}
+    .content blockquote{border-left:2px solid var(--accent);padding:0.75rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#a0aec0;font-size:0.95rem;}
+
+    .code-block{background:#060a0e;border:1px solid var(--border);padding:1.5rem;margin:1.5rem 0;overflow-x:auto;position:relative;}
+    .code-block .code-label{position:absolute;top:0.6rem;right:0.8rem;font-family:var(--mono);font-size:0.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+    .code-block pre{font-family:var(--mono);font-size:0.78rem;color:#c9d1d9;line-height:1.8;}
+    .cm{color:var(--muted);}
+
+    .callout{background:rgba(192,132,252,0.05);border:1px solid rgba(192,132,252,0.25);padding:1rem 1.25rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.8rem;color:var(--text);line-height:1.7;}
+    .callout::before{content:'🔍 KEY INSIGHT — ';color:var(--accent);font-weight:700;}
+
+    .img-placeholder{width:100%;aspect-ratio:16/7;background:var(--surface);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin:1.5rem 0;letter-spacing:2px;}
+
+    /* Citation style */
+    .citation{font-family:var(--mono);font-size:0.72rem;color:var(--muted);padding:0.4rem 0.8rem;border-left:1px solid var(--border);margin:0.25rem 0;display:block;}
+    .citation a{color:var(--accent);}
+
+    .post-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin:3rem 0 1rem;}
+    .post-tags span{font-family:var(--mono);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--muted);}
+
+    footer{position:relative;z-index:10;border-top:1px solid var(--border);padding:2rem;font-family:var(--mono);font-size:0.7rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+    footer a{color:var(--accent);text-decoration:none;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="../index.html">&gt; 0bsh3ll</a>
+    <a class="back" href="../index.html">Back to all posts</a>
+  </header>
+
+  <div class="hero">
+    <div class="tag-pill">📝 Research</div>
+    <!-- EDIT: Post title -->
+    <h1>POST TITLE HERE</h1>
+    <div class="meta-row">
+      <span>📅 YYYY-MM-DD</span>
+      <span>⏱ ~X min read</span>
+      <!-- EDIT: Topic area -->
+      <span>🏷 TOPIC / AREA</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── ABSTRACT ── -->
+    <!-- EDIT: Short summary of the research / post -->
+    <div class="abstract-box">
+      <div class="abstract-label">Abstract</div>
+      Write a 2–3 sentence abstract here summarizing what this research covers, what you found, and why it matters. This is shown as a quick preview.
+    </div>
+
+    <!-- ── BACKGROUND ── -->
+    <h2>Background</h2>
+    <p><!-- EDIT: Context, prior work, why this topic is interesting --></p>
+
+    <!-- ── FINDINGS ── -->
+    <h2>Findings</h2>
+
+    <h3>Finding 1</h3>
+    <p><!-- EDIT: Describe your first key finding --></p>
+
+    <div class="callout">
+      <!-- EDIT: The most important insight -->
+      Replace with your key insight from the research.
+    </div>
+
+    <h3>Finding 2</h3>
+    <p><!-- EDIT: Second finding --></p>
+
+    <div class="img-placeholder">[ DIAGRAM / CHART / SCREENSHOT ]</div>
+
+    <h3>Finding 3</h3>
+    <p><!-- EDIT: Third finding, delete if not needed --></p>
+
+    <!-- ── ANALYSIS ── -->
+    <h2>Analysis</h2>
+    <p><!-- EDIT: Deep dive, your interpretation of what you found --></p>
+
+    <blockquote>
+      <!-- EDIT: Noteworthy quote from a paper, report, or source -->
+      "A relevant quote from a source that supports or contextualizes your analysis."
+    </blockquote>
+
+    <!-- ── DATA / EVIDENCE — delete if not needed ── -->
+    <h2>Data / Evidence</h2>
+    <p><!-- EDIT: Supporting data, logs, samples, code --></p>
+
+    <div class="code-block">
+      <div class="code-label">evidence / data</div>
+      <pre><span class="cm"># EDIT: Paste relevant data, logs, or code here</span>
+data here...</pre>
+    </div>
+
+    <!-- ── IMPLICATIONS ── -->
+    <h2>Implications</h2>
+    <p><!-- EDIT: So what? Why does this matter? What does it mean? --></p>
+
+    <!-- ── CONCLUSION ── -->
+    <h2>Conclusion</h2>
+    <p><!-- EDIT: Wrap up, open questions, next steps --></p>
+
+    <!-- ── REFERENCES ── -->
+    <h2>References</h2>
+    <!-- EDIT: Add all references -->
+    <span class="citation">[1] <a href="#">Paper / Article / Report Title — Author, Year</a></span>
+    <span class="citation">[2] <a href="#">Paper / Article / Report Title — Author, Year</a></span>
+    <span class="citation">[3] <a href="#">Paper / Article / Report Title — Author, Year</a></span>
+
+    <!-- EDIT: Update tags -->
+    <div class="post-tags">
+      <span>research</span><span>threat intel</span><span>analysis</span>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>// 0bsh3ll — for educational &amp; research purposes only</span>
+    <span><a href="https://github.com/0bsh3ll">GitHub</a> · <a href="https://linkedin.com/in/YOUR_PROFILE">LinkedIn</a></span>
+  </footer>
+</body>
+</html>

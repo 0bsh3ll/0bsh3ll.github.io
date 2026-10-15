@@ -1,0 +1,507 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>0bsh3ll — Malware · RE · AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── DARK MODE (default) ── */
+    :root {
+      --bg: #0b0d10;
+      --surface: #12151a;
+      --header-bg: rgba(11,13,16,0.92);
+      --border: #22262c;
+      --accent: #7c6cf0;
+      --text: #cbd0d6;
+      --heading: #f5f5f7;
+      --post-title: #eceef1;
+      --muted: #6b7280;
+      --text-secondary: #9aa1ab;
+      --grid-line: rgba(124,108,240,0.03);
+      --mark-bg: #7c6cf0;
+      --mark-text: #0b0d10;
+      --sans: 'Syne', sans-serif;
+    }
+
+    /* ── LIGHT MODE ── */
+    :root.light {
+      --bg: #f2f1ed;
+      --surface: #fafaf7;
+      --header-bg: rgba(242,241,237,0.92);
+      --border: #dcdad3;
+      --accent: #4f46e5;
+      --text: #2f343b;
+      --heading: #0f1117;
+      --post-title: #111827;
+      --muted: #666b72;
+      --text-secondary: #454b54;
+      --grid-line: rgba(79,70,229,0.035);
+      --mark-bg: #4f46e5;
+      --mark-text: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .logo {
+      font-family: var(--sans); font-size: 1.1rem; font-weight: 700;
+      color: var(--text); letter-spacing: 2px;
+      transition: color 0.3s ease;
+    }
+    .logo span { color: var(--accent); transition: color 0.3s ease; }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    nav { display: flex; gap: 2rem; }
+    nav a {
+      font-family: var(--sans); font-size: 0.75rem;
+      color: var(--muted); text-decoration: none;
+      letter-spacing: 2px; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      padding: 0.35rem 0.7rem;
+      display: flex; align-items: center;
+      font-family: var(--sans); font-size: 0.7rem;
+      color: var(--muted);
+      transition: border-color 0.2s, color 0.2s, background 0.3s ease;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-icon { font-size: 0.95rem; line-height: 1; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 10;
+      padding: 5rem 2rem 4rem;
+      max-width: 1080px; margin: 0 auto;
+    }
+    .hero-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 2.5rem;
+    }
+    .hero-text { flex: 1 1 420px; min-width: 0; }
+    .hero-visual { flex: 0 0 240px; max-width: 240px; }
+    .hero-visual svg { display: block; width: 100%; height: auto; animation: heroFloat 4s ease-in-out infinite; }
+    .hero-cursor { animation: blink 1s step-end infinite; }
+    @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    @media (max-width: 700px) {
+      .hero-inner { flex-direction: column; }
+      .hero-visual { max-width: 200px; }
+    }
+    .hero-label {
+      font-family: var(--sans); font-size: 0.7rem;
+      color: var(--accent); letter-spacing: 4px;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    .hero-label::before { content: ''; width: 20px; height: 1px; background: var(--accent); transition: background 0.3s ease; }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800; line-height: 1.05;
+      letter-spacing: -1px; color: var(--heading);
+      margin-bottom: 1.5rem;
+      transition: color 0.3s ease;
+    }
+    h1 .highlight { color: transparent; -webkit-text-stroke: 1px var(--accent); }
+    .hero-bio {
+      font-family: var(--sans); font-size: 0.95rem;
+      color: var(--text-secondary); line-height: 1.8;
+      max-width: 560px;
+      border-left: 2px solid var(--border);
+      padding-left: 1rem;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-wrap {
+      position: relative; z-index: 10;
+      max-width: 1080px; margin: 0 auto;
+      padding: 0 2rem 1.5rem;
+    }
+    .search-inner { position: relative; }
+    .search-box {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 0.8rem 5rem 0.8rem 1.2rem;
+      font-family: var(--sans); font-size: 0.82rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, background 0.3s ease, color 0.3s ease;
+    }
+    .search-box::placeholder { color: var(--muted); }
+    .search-box:focus { border-color: var(--accent); }
+    .search-count {
+      position: absolute; right: 1rem; top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--sans); font-size: 0.65rem;
+      color: var(--muted); letter-spacing: 1px;
+      pointer-events: none;
+    }
+
+    /* ── FILTER TABS ── */
+    .filter-bar {
+      position: relative; z-index: 10;
+      max-width: 1080px; margin: 0 auto;
+      padding: 0 2rem 2.5rem;
+      display: flex; gap: 1.75rem; flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-family: var(--sans); font-size: 0.8rem; font-weight: 600;
+      padding: 0.3rem 0;
+      border: none; border-bottom: 2px solid transparent;
+      background: transparent; color: var(--muted);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover { color: var(--text); }
+    .filter-btn.active {
+      color: var(--heading); border-bottom-color: var(--accent);
+    }
+
+    /* ── POSTS LIST ── */
+    .posts {
+      position: relative; z-index: 10;
+      max-width: 1080px; margin: 0 auto;
+      padding: 0 2rem 6rem;
+      display: flex; flex-direction: column;
+    }
+    .post-card {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0; cursor: pointer;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 1rem; align-items: start;
+      text-decoration: none; color: inherit;
+      position: relative;
+    }
+    .post-card:last-child { border-bottom: none; }
+    .post-meta { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.6rem; }
+    .post-tag {
+      font-family: var(--sans); font-size: 0.6rem;
+      letter-spacing: 2px; text-transform: uppercase; padding: 0.2rem 0.6rem;
+    }
+
+    /* dark tag colors */
+    .tag-malware  { color: #ff3c6e; border: 1px solid rgba(255,60,110,0.3); }
+    .tag-re       { color: #3c8eff; border: 1px solid rgba(60,142,255,0.3); }
+    .tag-ai       { color: #00ff9d; border: 1px solid rgba(0,255,157,0.3); }
+    .tag-lab      { color: #f0c040; border: 1px solid rgba(240,192,64,0.3); }
+    .tag-research { color: #c084fc; border: 1px solid rgba(192,132,252,0.3); }
+    .tag-cool     { color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+    .tag-scripts  { color: #67e8f9; border: 1px solid rgba(103,232,249,0.3); }
+    .tag-certs    { color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
+
+    /* light tag colors */
+    .light .tag-malware  { color: #b8003a; border-color: rgba(184,0,58,0.3); }
+    .light .tag-re       { color: #1040b0; border-color: rgba(16,64,176,0.3); }
+    .light .tag-ai       { color: #006e42; border-color: rgba(0,110,66,0.3); }
+    .light .tag-lab      { color: #8a6800; border-color: rgba(138,104,0,0.3); }
+    .light .tag-research { color: #7e22ce; border-color: rgba(126,34,206,0.3); }
+    .light .tag-cool     { color: #c2430a; border-color: rgba(194,67,10,0.3); }
+    .light .tag-scripts  { color: #0e7490; border-color: rgba(14,116,144,0.3); }
+    .light .tag-certs    { color: #be185d; border-color: rgba(190,24,93,0.3); }
+
+    .post-date { font-family: var(--sans); font-size: 0.65rem; color: var(--muted); }
+    .post-title {
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--post-title); margin-bottom: 0.5rem; line-height: 1.3;
+      transition: color 0.2s ease;
+    }
+    .post-card:hover .post-title { color: var(--accent); }
+    .post-excerpt { font-family: var(--sans); font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+
+    /* search highlight */
+    mark {
+      background: var(--mark-bg);
+      color: var(--mark-text);
+      padding: 0 2px;
+      border-radius: 1px;
+    }
+
+    .post-arrow {
+      font-family: var(--sans); font-size: 1.2rem;
+      color: var(--muted); align-self: center;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .post-card:hover .post-arrow { color: var(--accent); transform: translateX(4px); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      font-family: var(--sans); font-size: 0.8rem;
+      color: var(--muted); padding: 4rem 0;
+      text-align: center; letter-spacing: 2px; display: none;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 10;
+      border-top: 1px solid var(--border);
+      padding: 2rem; font-family: var(--sans);
+      font-size: 0.7rem; color: var(--muted);
+      display: flex; justify-content: space-between;
+      align-items: center; gap: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    footer a { color: var(--accent); text-decoration: none; transition: color 0.3s ease; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── FADE IN ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .hero       { animation: fadeUp 0.6s ease both; }
+    .search-wrap{ animation: fadeUp 0.6s 0.08s ease both; }
+    .filter-bar { animation: fadeUp 0.6s 0.14s ease both; }
+    .posts      { animation: fadeUp 0.6s 0.2s ease both; }
+
+    @media (max-width: 600px) {
+      .post-card { grid-template-columns: 1fr; }
+      .post-arrow { display: none; }
+      nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">&gt; 0b<span>sh3ll</span></div>
+    <div class="nav-right">
+      <nav>
+        <a href="https://github.com/0bsh3ll" target="_blank">GitHub</a>
+        <a href="https://www.linkedin.com/in/0bsh3ll/" target="_blank">LinkedIn</a>
+      </nav>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">
+        <span class="theme-icon" id="themeIcon">☀️</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-label">Security Research &amp; Automation</div>
+        <h1>Malware · <span class="highlight">Reverse</span><br>Engineering · AI</h1>
+        <p class="hero-bio">
+          Dissecting binaries, reversing malware, and automating everything in between.
+          This is where the detailed writeups live.
+        </p>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <svg viewBox="0 0 400 300" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <!-- desk lamp -->
+          <line x1="352" y1="30" x2="308" y2="76" stroke="var(--border)" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="352" cy="30" r="16" fill="none" stroke="var(--border)" stroke-width="4"/>
+          <circle cx="352" cy="30" r="6" fill="var(--accent)" opacity="0.7"/>
+
+          <!-- monitor -->
+          <rect x="70" y="56" width="230" height="150" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+          <rect x="70" y="56" width="230" height="20" rx="8" fill="var(--border)" opacity="0.5"/>
+          <circle cx="82" cy="66" r="2.5" fill="var(--muted)"/>
+          <circle cx="90" cy="66" r="2.5" fill="var(--muted)"/>
+          <circle cx="98" cy="66" r="2.5" fill="var(--muted)"/>
+
+          <rect x="86" y="92" width="80" height="6" rx="3" fill="var(--accent)" opacity="0.8"/>
+          <rect x="86" y="106" width="120" height="6" rx="3" fill="var(--muted)"/>
+          <rect x="86" y="120" width="60" height="6" rx="3" fill="var(--muted)"/>
+          <rect x="86" y="134" width="100" height="6" rx="3" fill="var(--accent)" opacity="0.5"/>
+          <rect x="86" y="148" width="50" height="6" rx="3" fill="var(--muted)"/>
+          <rect x="86" y="162" width="6" height="10" fill="var(--accent)" class="hero-cursor"/>
+
+          <!-- monitor stand -->
+          <rect x="175" y="206" width="10" height="16" fill="var(--border)"/>
+          <rect x="150" y="222" width="60" height="6" rx="3" fill="var(--border)"/>
+
+          <!-- desk line -->
+          <line x1="30" y1="260" x2="370" y2="260" stroke="var(--border)" stroke-width="2"/>
+
+          <!-- cat, seen from behind, sitting at the desk -->
+          <g class="hero-cat">
+            <path d="M148 172 L160 138 L178 170 Z" fill="var(--heading)"/>
+            <path d="M252 172 L240 138 L222 170 Z" fill="var(--heading)"/>
+            <path d="M140 258 Q136 168 200 168 Q264 168 260 258 Z" fill="var(--heading)"/>
+            <path d="M256 246 Q296 232 288 186" stroke="var(--heading)" stroke-width="10" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SEARCH ── -->
+  <div class="search-wrap">
+    <div class="search-inner">
+      <input
+        class="search-box"
+        id="searchBox"
+        type="text"
+        placeholder="Search posts..."
+        oninput="handleSearch(this.value)"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <span class="search-count" id="searchCount"></span>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterPosts('all', this)">All</button>
+    <button class="filter-btn" onclick="filterPosts('malware', this)">Malware</button>
+    <button class="filter-btn" onclick="filterPosts('re', this)">Reverse Engineering</button>
+    <button class="filter-btn" onclick="filterPosts('ai', this)">AI &amp; Automation</button>
+    <button class="filter-btn" onclick="filterPosts('lab', this)">Lab Notes</button>
+    <button class="filter-btn" onclick="filterPosts('research', this)">Research</button>
+    <button class="filter-btn" onclick="filterPosts('cool', this)">Cool Stuff</button>
+    <button class="filter-btn" onclick="filterPosts('scripts', this)">Scripts</button>
+    <button class="filter-btn" onclick="filterPosts('certs', this)">Certifications</button>
+  </div>
+
+  <section class="posts" id="posts">
+{% for post in site.data.posts %}
+    <a class="post-card" data-tag="{{ post.tag }}" href="{{ post.url }}">
+      <div>
+        <div class="post-meta">
+          <span class="post-tag tag-{{ post.tag }}">{{ post.tag_label }}</span>
+          <span class="post-date">{{ post.date }}</span>
+        </div>
+        <div class="post-title">{{ post.title }}</div>
+        <div class="post-excerpt">{{ post.excerpt }}</div>
+      </div>
+      <div class="post-arrow">→</div>
+    </a>
+{% endfor %}
+    <div class="empty-state" id="empty">// no posts match this filter yet</div>
+
+  </section>
+
+  <footer>
+    <span>// All content for educational &amp; research purposes only.</span>
+    <span>
+      <a href="https://github.com/0bsh3ll" target="_blank">GitHub</a> &nbsp;·&nbsp;
+      <a href="https://www.linkedin.com/in/0bsh3ll/" target="_blank">LinkedIn</a>
+    </span>
+  </footer>
+
+  <script>
+    // ── THEME ──
+    const root = document.documentElement;
+    const icon = document.getElementById('themeIcon');
+    if (localStorage.getItem('theme') === 'light') {
+      root.classList.add('light');
+      icon.textContent = '🌙';
+    }
+    function toggleTheme() {
+      const isLight = root.classList.toggle('light');
+      icon.textContent = isLight ? '🌙' : '☀️';
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    }
+
+    // ── FILTER + SEARCH STATE ──
+    let activeTag = 'all';
+    let activeQuery = '';
+
+    // Store original text for each card so we can restore after highlight
+    document.querySelectorAll('.post-card').forEach(card => {
+      card.dataset.origTitle   = card.querySelector('.post-title').innerHTML;
+      card.dataset.origExcerpt = card.querySelector('.post-excerpt').innerHTML;
+    });
+
+    function applyFilters() {
+      const cards   = document.querySelectorAll('.post-card');
+      const query   = activeQuery.trim().toLowerCase();
+      const countEl = document.getElementById('searchCount');
+      let visible   = 0;
+
+      cards.forEach(card => {
+        // Restore original text first
+        card.querySelector('.post-title').innerHTML   = card.dataset.origTitle;
+        card.querySelector('.post-excerpt').innerHTML  = card.dataset.origExcerpt;
+
+        const tagMatch     = activeTag === 'all' || card.dataset.tag === activeTag;
+        const titleText    = card.querySelector('.post-title').textContent.toLowerCase();
+        const excerptText  = card.querySelector('.post-excerpt').textContent.toLowerCase();
+        const tagText      = card.dataset.tag.toLowerCase();
+        const dateText     = card.querySelector('.post-date').textContent.toLowerCase();
+        const queryMatch   = !query ||
+          titleText.includes(query) ||
+          excerptText.includes(query) ||
+          tagText.includes(query) ||
+          dateText.includes(query);
+
+        const show = tagMatch && queryMatch;
+        card.style.display = show ? 'grid' : 'none';
+        if (show) {
+          visible++;
+          // Highlight matches in title and excerpt
+          if (query) {
+            const esc = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const re  = new RegExp(`(${esc})`, 'gi');
+            const titleEl   = card.querySelector('.post-title');
+            const excerptEl = card.querySelector('.post-excerpt');
+            titleEl.innerHTML   = titleEl.textContent.replace(re, '<mark>$1</mark>');
+            excerptEl.innerHTML = excerptEl.textContent.replace(re, '<mark>$1</mark>');
+          }
+        }
+      });
+
+      // Count display
+      if (query) {
+        countEl.textContent = visible + ' result' + (visible !== 1 ? 's' : '');
+      } else {
+        countEl.textContent = '';
+      }
+      document.getElementById('empty').style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    function filterPosts(tag, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTag = tag;
+      applyFilters();
+    }
+
+    function handleSearch(val) {
+      activeQuery = val;
+      applyFilters();
+    }
+  </script>
+
+</body>
+</html>

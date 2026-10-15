@@ -1,0 +1,11 @@
+title: 0bsh3ll
+description: "Malware · RE · AI"
+url: "https://0bsh3ll.github.io"
+baseurl: ""
+
+markdown: kramdown
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md

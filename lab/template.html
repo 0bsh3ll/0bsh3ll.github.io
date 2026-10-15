@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>POST TITLE — 0bsh3ll</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080b0f; --surface:#0d1117; --border:#1e2a38;
+      --accent:#f0c040; --text:#c9d1d9; --muted:#4a5568;
+      --mono:'Share Tech Mono',monospace; --sans:'Syne',sans-serif;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 4px);pointer-events:none;z-index:100;}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(240,192,64,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(240,192,64,0.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+    header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,11,15,0.92);backdrop-filter:blur(12px);}
+    .logo{font-family:var(--mono);font-size:1rem;color:var(--accent);letter-spacing:2px;text-decoration:none;}
+    .back{font-family:var(--mono);font-size:0.72rem;color:var(--muted);text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:color 0.2s;}
+    .back:hover{color:var(--accent);}
+    .back::before{content:'← ';}
+
+    .hero{position:relative;z-index:10;max-width:780px;margin:0 auto;padding:4rem 2rem 2.5rem;animation:fadeUp 0.5s ease both;}
+    .tag-pill{display:inline-block;font-family:var(--mono);font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);border:1px solid rgba(240,192,64,0.35);padding:0.25rem 0.75rem;margin-bottom:1.5rem;}
+    h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#e6edf3;line-height:1.15;margin-bottom:1rem;}
+    .meta-row{display:flex;gap:2rem;flex-wrap:wrap;font-family:var(--mono);font-size:0.7rem;color:var(--muted);border-top:1px solid var(--border);padding-top:1rem;margin-top:1.5rem;}
+
+    .env-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.2rem 1.5rem;margin:2.5rem 0;font-family:var(--mono);font-size:0.75rem;line-height:2.2;}
+    .env-box .lbl{color:var(--muted);display:inline-block;width:130px;}
+    .env-box .val{color:#e6edf3;}
+
+    .content{position:relative;z-index:10;max-width:780px;margin:0 auto;padding:0 2rem 6rem;animation:fadeUp 0.5s 0.1s ease both;}
+    .content h2{font-size:0.85rem;font-weight:700;color:#e6edf3;margin:3rem 0 1rem;padding-left:1rem;border-left:2px solid var(--accent);font-family:var(--mono);letter-spacing:3px;text-transform:uppercase;}
+    .content h3{font-size:0.9rem;font-weight:700;color:var(--accent);margin:2rem 0 0.75rem;font-family:var(--mono);}
+    .content p{font-size:0.95rem;color:var(--text);margin-bottom:1.2rem;line-height:1.85;}
+    .content a{color:var(--accent);text-decoration:none;}
+    .content a:hover{text-decoration:underline;}
+    .content ul,ol{padding-left:1.5rem;font-size:0.9rem;color:var(--text);line-height:2.2;margin-bottom:1.2rem;}
+
+    .code-block{background:#060a0e;border:1px solid var(--border);padding:1.5rem;margin:1.5rem 0;overflow-x:auto;position:relative;}
+    .code-block .code-label{position:absolute;top:0.6rem;right:0.8rem;font-family:var(--mono);font-size:0.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+    .code-block pre{font-family:var(--mono);font-size:0.78rem;color:#e0d090;line-height:1.8;}
+    .cm{color:var(--muted);} .kw{color:var(--accent);} .st{color:#a8d8a8);}
+
+    /* Numbered step list */
+    .step-list{counter-reset:steps;list-style:none;padding:0;margin:1.5rem 0;}
+    .step-list li{counter-increment:steps;padding:1rem 1rem 1rem 3.5rem;border-bottom:1px solid var(--border);font-size:0.9rem;position:relative;line-height:1.7;}
+    .step-list li:last-child{border-bottom:none;}
+    .step-list li::before{content:counter(steps);position:absolute;left:0.75rem;top:1rem;font-family:var(--mono);font-size:0.8rem;color:var(--accent);border:1px solid rgba(240,192,64,0.3);width:1.6rem;height:1.6rem;display:flex;align-items:center;justify-content:center;text-align:center;}
+
+    /* Spec table */
+    .spec-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--mono);font-size:0.75rem;}
+    .spec-table th{background:var(--surface);color:var(--muted);text-transform:uppercase;letter-spacing:2px;padding:0.6rem 1rem;text-align:left;border:1px solid var(--border);}
+    .spec-table td{padding:0.6rem 1rem;border:1px solid var(--border);color:var(--text);}
+    .spec-table tr:hover td{background:rgba(240,192,64,0.03);}
+    .spec-key{color:var(--accent);}
+
+    .callout{background:rgba(240,192,64,0.05);border:1px solid rgba(240,192,64,0.25);padding:1rem 1.25rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.8rem;color:var(--text);line-height:1.7;}
+    .callout::before{content:'📌 TIP — ';color:var(--accent);font-weight:700;}
+
+    .warn{background:rgba(255,60,110,0.05);border:1px solid rgba(255,60,110,0.2);padding:1rem 1.25rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.8rem;color:var(--text);line-height:1.7;}
+    .warn::before{content:'⚠ GOTCHA — ';color:#ff3c6e;font-weight:700;}
+
+    .img-placeholder{width:100%;aspect-ratio:16/7;background:var(--surface);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin:1.5rem 0;letter-spacing:2px;}
+
+    .post-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin:3rem 0 1rem;}
+    .post-tags span{font-family:var(--mono);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--muted);}
+
+    footer{position:relative;z-index:10;border-top:1px solid var(--border);padding:2rem;font-family:var(--mono);font-size:0.7rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+    footer a{color:var(--accent);text-decoration:none;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="../index.html">&gt; 0bsh3ll</a>
+    <a class="back" href="../index.html">Back to all posts</a>
+  </header>
+
+  <div class="hero">
+    <div class="tag-pill">🧪 Lab Notes</div>
+    <!-- EDIT: Post title -->
+    <h1>POST TITLE HERE</h1>
+    <div class="meta-row">
+      <span>📅 YYYY-MM-DD</span>
+      <span>⏱ ~X min read</span>
+      <!-- EDIT: Difficulty or environment type -->
+      <span>🖥 Home Lab / VM / Cloud</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── ENVIRONMENT INFO ── -->
+    <!-- EDIT: Fill in your lab environment -->
+    <div class="env-box">
+      <div><span class="lbl">Host OS</span>      <span class="val">Windows 11 / Ubuntu / etc</span></div>
+      <div><span class="lbl">Hypervisor</span>   <span class="val">VMware / VirtualBox / Proxmox</span></div>
+      <div><span class="lbl">Guest OS</span>     <span class="val">FlareVM / REMnux / Kali / etc</span></div>
+      <div><span class="lbl">Network</span>      <span class="val">Host-only / NAT / Isolated</span></div>
+      <div><span class="lbl">Hardware</span>     <span class="val">RAM / CPU / Storage</span></div>
+    </div>
+
+    <!-- ── OVERVIEW ── -->
+    <h2>Overview</h2>
+    <p><!-- EDIT: What this lab setup is for, what problem it solves --></p>
+
+    <!-- ── REQUIREMENTS ── -->
+    <h2>Requirements</h2>
+
+    <table class="spec-table">
+      <thead><tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr></thead>
+      <tbody>
+        <!-- EDIT: Fill in requirements -->
+        <tr><td class="spec-key">RAM</td>     <td>8 GB</td>   <td>16 GB</td></tr>
+        <tr><td class="spec-key">Storage</td> <td>100 GB</td> <td>250 GB SSD</td></tr>
+        <tr><td class="spec-key">CPU</td>     <td>4 cores</td><td>8 cores</td></tr>
+        <tr><td class="spec-key">OS</td>      <td>Windows 10</td><td>Windows 11</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ── SETUP STEPS ── -->
+    <h2>Setup Steps</h2>
+
+    <ol class="step-list">
+      <!-- EDIT: Replace with your actual steps -->
+      <li>
+        <strong>Step title</strong><br>
+        Describe what you do in this step. Be specific.
+        <div class="code-block" style="margin-top:0.75rem;">
+          <div class="code-label">command</div>
+          <pre><span class="cm"># EDIT: Replace with real command</span>
+your_command_here --flag value</pre>
+        </div>
+      </li>
+      <li>
+        <strong>Step title</strong><br>
+        Describe this step.
+      </li>
+      <li>
+        <strong>Step title</strong><br>
+        Describe this step.
+        <div class="img-placeholder">[ SCREENSHOT: result of this step ]</div>
+      </li>
+      <li>
+        <strong>Step title</strong><br>
+        Describe this step.
+      </li>
+    </ol>
+
+    <!-- ── CONFIGURATION ── -->
+    <h2>Configuration</h2>
+    <p><!-- EDIT: Key config settings, files, tweaks --></p>
+
+    <div class="code-block">
+      <div class="code-label">config / yaml / ini</div>
+      <pre><span class="cm"># EDIT: Paste relevant config here</span>
+setting_1: value
+setting_2: value
+<span class="kw">important_flag</span>: true</pre>
+    </div>
+
+    <div class="callout">
+      <!-- EDIT: Useful tip or shortcut -->
+      Replace with a useful tip from your experience setting this up.
+    </div>
+
+    <div class="warn">
+      <!-- EDIT: Common gotcha or mistake to avoid -->
+      Replace with a common mistake or gotcha to watch out for.
+    </div>
+
+    <!-- ── TESTING / VERIFICATION ── -->
+    <h2>Testing / Verification</h2>
+    <p><!-- EDIT: How to verify everything is working correctly --></p>
+
+    <div class="code-block">
+      <div class="code-label">verification</div>
+      <pre><span class="cm"># EDIT: Commands to verify setup</span>
+verify_command_here</pre>
+    </div>
+
+    <!-- ── TOOLS INSTALLED — delete if not a tool-setup post ── -->
+    <h2>Tools Installed</h2>
+    <ul>
+      <!-- EDIT: List key tools and what they're for -->
+      <li><strong>Tool Name</strong> — what it's used for</li>
+      <li><strong>Tool Name</strong> — what it's used for</li>
+      <li><strong>Tool Name</strong> — what it's used for</li>
+    </ul>
+
+    <!-- ── CONCLUSION ── -->
+    <h2>Conclusion</h2>
+    <p><!-- EDIT: Final thoughts, what this enables you to do --></p>
+
+    <!-- ── REFERENCES ── -->
+    <h2>References</h2>
+    <ul>
+      <li><a href="#">Official docs / download link</a></li>
+      <li><a href="#">Guide or resource you followed</a></li>
+    </ul>
+
+    <!-- EDIT: Update tags -->
+    <div class="post-tags">
+      <span>lab</span><span>setup</span><span>flarevm</span><span>vmware</span>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>// 0bsh3ll — for educational &amp; research purposes only</span>
+    <span><a href="https://github.com/0bsh3ll">GitHub</a> · <a href="https://linkedin.com/in/YOUR_PROFILE">LinkedIn</a></span>
+  </footer>
+</body>
+</html>
