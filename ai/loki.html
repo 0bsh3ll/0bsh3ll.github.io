@@ -1,708 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Loki — Local AI Agent That Actually Does Things — 0bsh3ll</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ── reset & base ───────────────────────────── */
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    :root{
-      --bg:#0b0d10;
-      --surface:#12151a;
-      --surface-2:#171b21;
-      --border:#22262c;
-      --text:#cbd0d6;
-      --text-dim:#6b7280;
-      --heading:#f5f5f7;
-      --accent:#7c6cf0;
-      --category:#00ff9d;
-      --category-dim:rgba(0,255,157,0.13);
-      --tag-bg:#171b21;
-      --code-bg:#0d0f13;
-      --link:#00ff9d;
-      --font-mono:'SF Mono','Fira Code','Cascadia Code','JetBrains Mono',monospace;
-      --font-sans:'Syne',sans-serif;
-    }
-    html{scroll-behavior:smooth}
-    body{
-      background:var(--bg);
-      color:var(--text);
-      font-family:var(--font-sans);
-      line-height:1.7;
-      min-height:100vh;
-    }
-    a{color:var(--link);text-decoration:none}
-    a:hover{text-decoration:underline}
-
-    /* ── layout ──────────────────────────────────── */
-    .wrapper{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
-
-    /* ── top bar ─────────────────────────────────── */
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;
-      padding-bottom:1.5rem;border-bottom:1px solid var(--border);
-      margin-bottom:2.5rem;
-    }
-    .topbar .logo{font-family:var(--font-sans);font-weight:700;font-size:.95rem;color:var(--text)}
-    .topbar .logo span{color:var(--accent)}
-    .topbar .back{font-family:var(--font-sans);font-size:.85rem;color:var(--text-dim)}
-    .topbar .back:hover{color:var(--accent);text-decoration:none}
-
-    /* ── theme toggle (cosmetic) ─────────────────── */
-    .theme-toggle{
-      background:none;border:1px solid var(--border);border-radius:6px;
-      padding:4px 8px;cursor:pointer;font-size:1rem;color:var(--text-dim);
-    }
-    .theme-toggle:hover{border-color:var(--accent)}
-
-    /* ── category badge ──────────────────────────── */
-    .category{
-      font-family:var(--font-sans);font-weight:600;font-size:.8rem;color:var(--category);
-      letter-spacing:.04em;margin-bottom:.75rem;
-    }
-
-    /* ── article header ─────────────────────────── */
-    .article-title{
-      font-size:2rem;font-weight:700;color:var(--heading);
-      line-height:1.25;margin-bottom:1rem;
-    }
-    .meta{
-      display:flex;gap:1.5rem;flex-wrap:wrap;
-      font-family:var(--font-sans);font-size:.8rem;color:var(--text-dim);
-      margin-bottom:1.5rem;
-    }
-    .lead{
-      font-size:1.05rem;color:var(--text);line-height:1.8;
-      border-left:3px solid var(--category);
-      padding-left:1rem;margin-bottom:2.5rem;
-    }
-
-    /* ── stack badges ────────────────────────────── */
-    .stack{margin-bottom:3rem}
-    .stack-label{
-      font-family:var(--font-sans);font-weight:600;font-size:.75rem;color:var(--text-dim);
-      margin-bottom:.6rem;
-    }
-    .stack-list{display:flex;flex-wrap:wrap;gap:.5rem}
-    .stack-list span{
-      font-family:var(--font-sans);font-size:.8rem;
-      background:var(--tag-bg);border:1px solid var(--border);
-      border-radius:4px;padding:3px 10px;color:var(--text);
-    }
-
-    /* ── section headings ────────────────────────── */
-    .section-heading{
-      font-family:var(--font-sans);font-size:1.15rem;font-weight:700;
-      color:var(--heading);margin:3rem 0 1.25rem;
-    }
-    .section-heading .num{color:var(--category);margin-right:.3em}
-
-    /* ── prose ────────────────────────────────────── */
-    .prose{margin-bottom:1.5rem;color:var(--text);line-height:1.8}
-    .prose p{margin-bottom:1rem}
-    .prose strong{color:var(--heading)}
-
-    /* ── pipeline / steps ─────────────────────────── */
-    .pipeline{
-      display:grid;grid-template-columns:1fr 1fr;gap:1rem;
-      margin-bottom:2rem;
-    }
-    @media(max-width:600px){.pipeline{grid-template-columns:1fr}}
-    .step{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:8px;padding:1.2rem;
-    }
-    .step-num{
-      font-family:var(--font-sans);font-weight:700;font-size:.75rem;
-      color:var(--category);margin-bottom:.35rem;
-    }
-    .step-title{font-weight:600;color:var(--heading);font-size:.95rem;margin-bottom:.4rem}
-    .step-desc{font-size:.85rem;color:var(--text-dim);line-height:1.6}
-
-    /* ── code blocks ─────────────────────────────── */
-    .code-block{
-      background:var(--code-bg);border:1px solid var(--border);
-      border-radius:8px;margin-bottom:2rem;overflow:hidden;
-    }
-    .code-header{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:.55rem 1rem;border-bottom:1px solid var(--border);
-      background:var(--surface);
-    }
-    .code-header .filename{
-      font-family:var(--font-mono);font-size:.78rem;color:var(--category);
-    }
-    .code-header .lang{
-      font-family:var(--font-mono);font-size:.7rem;color:var(--text-dim);
-    }
-    .code-block pre{
-      padding:1rem 1.2rem;overflow-x:auto;
-      font-family:var(--font-mono);font-size:.82rem;
-      line-height:1.65;color:var(--text);tab-size:4;
-    }
-    .code-block code .comment{color:#555}
-    .code-block code .keyword{color:#ff7b72}
-    .code-block code .string{color:#a5d6ff}
-    .code-block code .func{color:#d2a8ff}
-
-    /* ── inline code ─────────────────────────────── */
-    code.inline{
-      font-family:var(--font-mono);font-size:.85em;
-      background:var(--surface-2);border:1px solid var(--border);
-      border-radius:3px;padding:1px 6px;
-    }
-
-    /* ── callout boxes ───────────────────────────── */
-    .callout{
-      display:flex;gap:.75rem;
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:8px;padding:1rem 1.2rem;margin-bottom:2rem;
-    }
-    .callout.tip{border-left:3px solid var(--category)}
-    .callout.info{border-left:3px solid #3b82f6}
-    .callout.warn{border-left:3px solid #f59e0b}
-    .callout .icon{font-size:1.1rem;flex-shrink:0;line-height:1.6}
-    .callout .body{font-size:.88rem;color:var(--text-dim);line-height:1.65}
-
-    /* ── sample output block ─────────────────────── */
-    .output-block{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:8px;margin-bottom:2rem;overflow:hidden;
-    }
-    .output-header{
-      padding:.55rem 1rem;border-bottom:1px solid var(--border);
-      font-family:var(--font-mono);font-size:.78rem;color:var(--text-dim);
-    }
-    .output-block pre{
-      padding:1rem 1.2rem;overflow-x:auto;
-      font-family:var(--font-mono);font-size:.82rem;
-      line-height:1.65;color:var(--category);
-    }
-
-    /* ── architecture diagram (ascii) ────────────── */
-    .arch-diagram{
-      background:var(--code-bg);border:1px solid var(--border);
-      border-radius:8px;padding:1.5rem;margin-bottom:2rem;
-      overflow-x:auto;
-    }
-    .arch-diagram pre{
-      font-family:var(--font-mono);font-size:.78rem;
-      line-height:1.5;color:var(--category);text-align:center;
-    }
-
-    /* ── table ────────────────────────────────────── */
-    .info-table{
-      width:100%;border-collapse:collapse;margin-bottom:2rem;
-      font-size:.88rem;
-    }
-    .info-table th,.info-table td{
-      text-align:left;padding:.6rem .8rem;
-      border-bottom:1px solid var(--border);
-    }
-    .info-table th{
-      font-family:var(--font-sans);font-size:.78rem;
-      color:var(--text-dim);font-weight:600;text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-    .info-table td{color:var(--text)}
-    .info-table td code{
-      font-family:var(--font-mono);font-size:.82em;
-      color:var(--category);
-    }
-
-    /* ── tags ─────────────────────────────────────── */
-    .tags{
-      display:flex;flex-wrap:wrap;gap:.5rem;
-      margin-top:3rem;padding-top:1.5rem;
-      border-top:1px solid var(--border);
-    }
-    .tags span{
-      font-family:var(--font-sans);font-size:.75rem;
-      background:var(--tag-bg);border:1px solid var(--border);
-      border-radius:4px;padding:2px 10px;color:var(--text-dim);
-    }
-
-    /* ── prev / next nav ─────────────────────────── */
-    .post-nav{
-      display:flex;justify-content:space-between;gap:1rem;
-      margin-top:2.5rem;padding-top:1.5rem;
-      border-top:1px solid var(--border);
-      font-family:var(--font-sans);font-size:.85rem;
-    }
-    .post-nav a{color:var(--text-dim)}
-    .post-nav a:hover{color:var(--accent);text-decoration:none}
-
-    /* ── footer ──────────────────────────────────── */
-    .footer{
-      text-align:center;margin-top:4rem;padding-top:1.5rem;
-      border-top:1px solid var(--border);
-      font-family:var(--font-sans);font-size:.75rem;color:var(--text-dim);
-    }
-    .footer a{color:var(--text-dim)}
-    .footer a:hover{color:var(--accent)}
+    :root{--bg:#0b0d10;--surface:#12151a;--header-bg:rgba(11,13,16,0.92);--border:#22262c;--accent:#7c6cf0;--category:#00ff9d;--category-glow:rgba(0,255,157,0.07);--category-border:rgba(0,255,157,0.35);--text:#cbd0d6;--heading:#f5f5f7;--post-title:#eceef1;--muted:#6b7280;--grid-line:rgba(124,108,240,0.03);--code-bg:#0d0f13;--syn-comment:#6b7280;--syn-keyword:#ff7b72;--syn-string:#a5d6ff;--syn-func:#d2a8ff;--sans:'Open Sans',sans-serif;--code-font:'SF Mono','Fira Code','Cascadia Code','JetBrains Mono',monospace;}
+    :root.light{--bg:#f2f1ed;--surface:#fafaf7;--header-bg:rgba(242,241,237,0.92);--border:#dcdad3;--accent:#4f46e5;--category:#006e42;--category-glow:rgba(0,110,66,0.06);--category-border:rgba(0,110,66,0.3);--text:#2f343b;--heading:#0f1117;--post-title:#111827;--muted:#666b72;--grid-line:rgba(79,70,229,0.035);--code-bg:#f6f8fa;--syn-comment:#6a737d;--syn-keyword:#cf222e;--syn-string:#0a3069;--syn-func:#8250df;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);transition:background .3s,color .3s;}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+    header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:var(--header-bg);backdrop-filter:blur(12px);transition:background .3s,border-color .3s;}
+    .logo{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--text);letter-spacing:2px;text-decoration:none;}
+    .logo span{color:var(--accent);}
+    .header-right{display:flex;align-items:center;gap:1rem;}
+    .back-btn{font-family:var(--sans);font-size:0.75rem;font-weight:600;letter-spacing:1px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:0.4rem 1rem;transition:all .2s;}
+    .back-btn:hover{color:var(--accent);border-color:var(--accent);}
+    .theme-toggle{background:none;border:1px solid var(--border);cursor:pointer;padding:0.35rem 0.6rem;font-size:0.9rem;color:var(--muted);transition:all .2s;}
+    .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+    .article-hero{position:relative;z-index:10;max-width:800px;margin:0 auto;padding:4rem 2rem 2rem;animation:fadeUp .5s ease both;}
+    .article-tag{display:inline-block;font-family:var(--sans);font-size:0.7rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--category);border:1px solid var(--category-border);padding:0.3rem 0.8rem;margin-bottom:1.5rem;}
+    .article-title{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;line-height:1.1;color:var(--heading);margin-bottom:1rem;transition:color .3s;}
+    .article-meta{font-family:var(--sans);font-size:0.78rem;color:var(--muted);display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:2rem;}
+    .article-summary{font-family:var(--sans);font-size:0.92rem;color:var(--text);line-height:1.8;border-left:3px solid var(--category);padding:1rem 1.2rem;background:var(--category-glow);}
+    .specs-bar{position:relative;z-index:10;max-width:800px;margin:0 auto;padding:0 2rem 2rem;animation:fadeUp .5s .1s ease both;}
+    .specs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;border:1px solid var(--border);background:var(--border);}
+    .spec-item{padding:0.8rem 1rem;background:var(--surface);}
+    .spec-label{font-family:var(--sans);font-size:0.65rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;}
+    .spec-value{font-family:var(--sans);font-size:0.85rem;font-weight:600;color:var(--category);}
+    .article-body{position:relative;z-index:10;max-width:800px;margin:0 auto;padding:0 2rem 6rem;animation:fadeUp .5s .15s ease both;}
+    .section-heading{font-family:var(--sans);font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--category);margin:3rem 0 1rem;display:flex;align-items:center;gap:0.8rem;}
+    .section-heading::after{content:'';flex:1;height:1px;background:var(--border);}
+    h3{font-size:1.05rem;font-weight:700;color:var(--post-title);margin:2rem 0 0.8rem;}
+    .prose p{font-size:0.95rem;color:var(--text);line-height:1.85;margin-bottom:1.2rem;}
+    .prose strong{color:var(--heading);}
+    .article-summary a,.prose a{color:var(--category);text-decoration:underline;text-underline-offset:3px;}
+    .article-summary a:hover,.prose a:hover{color:var(--accent);}
+    .pipeline{display:grid;grid-template-columns:1fr 1fr;gap:1px;border:1px solid var(--border);background:var(--border);margin:1.5rem 0 2rem;}
+    .step{background:var(--surface);padding:1.2rem;}
+    .step-num{font-size:0.7rem;font-weight:700;letter-spacing:1px;color:var(--category);margin-bottom:0.35rem;}
+    .step-title{font-weight:700;color:var(--heading);font-size:0.95rem;margin-bottom:0.4rem;}
+    .step-desc{font-size:0.85rem;color:var(--muted);line-height:1.6;}
+    .code-block,.output-block{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--category);margin:1.5rem 0 2rem;overflow:hidden;}
+    .code-header,.output-header{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 1rem;border-bottom:1px solid var(--border);background:var(--surface);font-size:0.7rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+    .code-header .filename{font-family:var(--code-font);text-transform:none;letter-spacing:0;font-size:0.78rem;color:var(--category);}
+    .code-block pre,.output-block pre{padding:1rem 1.2rem;overflow-x:auto;font-family:var(--code-font);font-size:0.82rem;line-height:1.65;color:var(--text);tab-size:4;}
+    .output-block pre{color:var(--category);}
+    .code-block code .comment{color:var(--syn-comment);}
+    .code-block code .keyword{color:var(--syn-keyword);}
+    .code-block code .string{color:var(--syn-string);}
+    .code-block code .func{color:var(--syn-func);}
+    .arch-diagram{background:var(--code-bg);border:1px solid var(--border);padding:1.5rem;margin:1.5rem 0 2rem;overflow-x:auto;}
+    .arch-diagram pre{font-family:var(--code-font);font-size:0.78rem;line-height:1.5;color:var(--category);width:max-content;margin:0 auto;}
+    code.inline,.info-table td code{font-family:var(--code-font);font-size:0.85em;background:var(--category-glow);color:var(--category);padding:0.1rem 0.4rem;border:1px solid var(--category-border);}
+    .callout{display:flex;gap:1rem;padding:1rem 1.2rem;margin:1.5rem 0;border:1px solid var(--border);font-size:0.88rem;line-height:1.7;}
+    .callout.tip{border-left:3px solid var(--category);background:var(--category-glow);}
+    .callout.info{border-left:3px solid #3b82f6;background:rgba(59,130,246,0.06);}
+    .callout.warn{border-left:3px solid #f59e0b;background:rgba(245,158,11,0.06);}
+    .callout .icon{font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
+    .callout .body{color:var(--text);}
+    .info-table{width:100%;border-collapse:collapse;margin:1.5rem 0 2rem;}
+    .info-table th{font-size:0.7rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:0.6rem 1rem;text-align:left;border-bottom:1px solid var(--border);background:var(--surface);}
+    .info-table td{font-size:0.85rem;color:var(--text);padding:0.7rem 1rem;border-bottom:1px solid var(--border);}
+    .article-tags{display:flex;gap:0.5rem;flex-wrap:wrap;margin:3rem 0 1rem;}
+    .article-tags span{font-family:var(--sans);font-size:0.7rem;letter-spacing:1px;color:var(--muted);border:1px solid var(--border);padding:0.2rem 0.6rem;text-transform:uppercase;}
+    .post-nav{display:flex;justify-content:space-between;gap:1rem;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);}
+    .post-nav a{font-family:var(--sans);font-size:0.8rem;color:var(--muted);text-decoration:none;padding:0.6rem 1rem;border:1px solid var(--border);transition:all .2s;max-width:45%;}
+    .post-nav a:hover{color:var(--accent);border-color:var(--accent);}
+    .post-nav .nav-label{font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:0.3rem;}
+    .post-nav .nav-title{color:var(--post-title);}
+    @media (max-width:600px){header{padding:0 1rem;}.article-hero,.specs-bar,.article-body{padding-left:1rem;padding-right:1rem;}.pipeline{grid-template-columns:1fr;}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
 <body>
+  <header>
+    <a class="logo" href="../index.html">&gt; 0b<span>sh3ll</span>_</a>
+    <div class="header-right">
+      <a class="back-btn" href="../index.html">← Back</a>
+      <button class="theme-toggle" onclick="toggleTheme()" id="ti" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
 
-<div class="wrapper">
-
-  <!-- top bar -->
-  <div class="topbar">
-    <a href="https://0bsh3ll.github.io/index.html" class="logo">> 0bsh3ll<span>_</span></a>
-    <div style="display:flex;align-items:center;gap:.75rem">
-      <a href="https://0bsh3ll.github.io/index.html" class="back">← Back</a>
-      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+  <div class="article-hero">
+    <div class="article-tag">🤖 AI &amp; Automation</div>
+    <h1 class="article-title">Loki — A Local AI Agent That Actually Does Things</h1>
+    <div class="article-meta">
+      <span>📅 2025-04-29</span>
+      <span>⏱ 12 min read</span>
+      <span>⚙️ Local LLM agent harness</span>
+    </div>
+    <div class="article-summary">
+      A ~200-line Python CLI agent that wraps a local Ollama model and gives it tools — file I/O, code editing, web search — through a simple text protocol. No cloud, no API keys. Responses stream token-by-token. The LLM never touches your filesystem directly: it asks for things to happen, and the harness makes them happen.
+      <a href="https://github.com/0bsh3ll/loki" target="_blank" rel="noopener">Full Loki code on GitHub ↗</a>
     </div>
   </div>
 
-  <!-- category -->
-  <div class="category">🤖 AI &amp; Automation</div>
-
-  <!-- title -->
-  <h1 class="article-title">Loki — A Local AI Agent That Actually Does Things</h1>
-
-  <!-- meta -->
-  <div class="meta">
-    <span>📅 2025-04-29</span>
-    <span>⏱ 12 min read</span>
-    <span>⚙️ Local LLM agent harness</span>
-  </div>
-
-  <!-- lead -->
-  <p class="lead">
-    A ~200-line Python CLI agent that wraps a local Ollama model and gives it tools — file I/O, code editing, web search — through a simple text protocol. No cloud, no API keys. Responses stream token-by-token. The LLM never touches your filesystem directly: it asks for things to happen, and the harness makes them happen.
-    <a href="https://github.com/0bsh3ll/loki">[Full loki code here!]</a>
-  </p>
-
-  <!-- stack -->
-  <div class="stack">
-    <div class="stack-label">// Stack &amp; Tools</div>
-    <div class="stack-list">
-      <span>Python 3.9+</span>
-      <span>Ollama</span>
-      <span>qwen2.5-7B</span>
-      <span>DuckDuckGo Search</span>
-      <span>requests</span>
+  <div class="specs-bar">
+    <div class="specs-grid">
+      <div class="spec-item"><div class="spec-label">Language</div><div class="spec-value">Python 3.9+</div></div>
+      <div class="spec-item"><div class="spec-label">Runtime</div><div class="spec-value">Ollama</div></div>
+      <div class="spec-item"><div class="spec-label">Model</div><div class="spec-value">qwen2.5-7B</div></div>
+      <div class="spec-item"><div class="spec-label">Search</div><div class="spec-value">DuckDuckGo (DDGS)</div></div>
+      <div class="spec-item"><div class="spec-label">Dependencies</div><div class="spec-value">requests + ddgs</div></div>
+      <div class="spec-item"><div class="spec-label">Agent Loop</div><div class="spec-value">~200 lines</div></div>
     </div>
   </div>
 
-  <!-- 01 — The Problem -->
-  <h2 class="section-heading"><span class="num">01</span> — The Problem</h2>
-  <div class="prose">
-    <p>Cloud AI assistants are powerful but they phone home with every keystroke. Local LLMs are private but dumb in isolation — they can't search the web, read your files, or edit code. The missing piece isn't a smarter model, it's a <strong>harness</strong> that gives a local model real capabilities through tools.</p>
-    <p>The goal: type a question in your terminal, get a grounded answer. If the model needs to search the web, it searches. If it needs to read a file, it reads. If it needs to create one, it creates. All visible in your terminal, all local, all under your control.</p>
-    <p>Built on the architecture described in <a href="https://www.mihaileric.com/The-Emperor-Has-No-Clothes/" target="_blank">The Emperor Has No Clothes</a> — the idea that you don't need a massive framework, just a clean loop and a text protocol.</p>
-  </div>
+  <div class="article-body">
 
-  <!-- 02 — Architecture -->
-  <h2 class="section-heading"><span class="num">02</span> — Architecture</h2>
-  <div class="prose">
-    <p>Loki follows the <strong>harness pattern</strong>: a thin Python loop wraps the LLM and gives it tools through a text protocol. Every module is independent — swap the LLM provider by replacing one file, add tools by dropping Python files into a folder.</p>
-  </div>
-
-  <div class="arch-diagram">
-    <pre>
-User Input
-    ↓
-┌─────────────────────────────────┐
-│  System Prompt                  │
-│  (personality + tool schemas)   │
-└──────────────┬──────────────────┘
-               ↓
-┌─────────────────────────────────┐
-│  LLM (Ollama, streaming)        │
-│  Replies with prose or          │
-│  tool: NAME({"args": "..."})    │
-└──────────────┬──────────────────┘
-               ↓
-┌─────────────────────────────────┐
-│  StreamPrinter + Tool Parser    │
-│  Live-suppress tool lines;      │
-│  detect calls in accumulated    │
-│  response                       │
-└──────────────┬──────────────────┘
-               ↓
-       ┌───────┴───────┐
-       │               │
-   No tools         Tool call(s)
-       │               │
-   Done — wait     Execute via Registry
-   for next            │
-   prompt          Feed result back
-                       │
-                   Loop back to LLM
-    </pre>
-  </div>
-
-  <div class="pipeline">
-    <div class="step">
-      <div class="step-num">01</div>
-      <div class="step-title">System Prompt Injection</div>
-      <div class="step-desc">Tool schemas auto-generated from function signatures and docstrings, injected into the system prompt at startup.</div>
+    <!-- 01 — The Problem -->
+    <div class="section-heading">01 — The Problem</div>
+    <div class="prose">
+      <p>Cloud AI assistants are powerful but they phone home with every keystroke. Local LLMs are private but dumb in isolation — they can't search the web, read your files, or edit code. The missing piece isn't a smarter model, it's a <strong>harness</strong> that gives a local model real capabilities through tools.</p>
+      <p>The goal: type a question in your terminal, get a grounded answer. If the model needs to search the web, it searches. If it needs to read a file, it reads. If it needs to create one, it creates. All visible in your terminal, all local, all under your control.</p>
+      <p>Built on the architecture described in <a href="https://www.mihaileric.com/The-Emperor-Has-No-Clothes/" target="_blank" rel="noopener">The Emperor Has No Clothes</a> — the idea that you don't need a massive framework, just a clean loop and a text protocol.</p>
     </div>
-    <div class="step">
-      <div class="step-num">02</div>
-      <div class="step-title">Streaming Response</div>
-      <div class="step-desc">Ollama streams NDJSON token-by-token. StreamPrinter suppresses <code class="inline">tool:</code> lines live so the user only sees the answer.</div>
+
+    <!-- 02 — Architecture -->
+    <div class="section-heading">02 — Architecture</div>
+    <div class="prose">
+      <p>Loki follows the <strong>harness pattern</strong>: a thin Python loop wraps the LLM and gives it tools through a text protocol. Every module is independent — swap the LLM provider by replacing one file, add tools by dropping Python files into a folder.</p>
     </div>
-    <div class="step">
-      <div class="step-num">03</div>
-      <div class="step-title">Tool Execution</div>
-      <div class="step-desc">Parser extracts tool calls from accumulated text, executes via the decorator-based registry, feeds results back.</div>
+
+    <div class="arch-diagram">
+      <pre>
+  User Input
+      ↓
+  ┌─────────────────────────────────┐
+  │  System Prompt                  │
+  │  (personality + tool schemas)   │
+  └──────────────┬──────────────────┘
+                 ↓
+  ┌─────────────────────────────────┐
+  │  LLM (Ollama, streaming)        │
+  │  Replies with prose or          │
+  │  tool: NAME({"args": "..."})    │
+  └──────────────┬──────────────────┘
+                 ↓
+  ┌─────────────────────────────────┐
+  │  StreamPrinter + Tool Parser    │
+  │  Live-suppress tool lines;      │
+  │  detect calls in accumulated    │
+  │  response                       │
+  └──────────────┬──────────────────┘
+                 ↓
+         ┌───────┴───────┐
+         │               │
+     No tools         Tool call(s)
+         │               │
+     Done — wait     Execute via Registry
+     for next            │
+     prompt          Feed result back
+                         │
+                     Loop back to LLM
+      </pre>
     </div>
-    <div class="step">
-      <div class="step-num">04</div>
-      <div class="step-title">Forced Search</div>
-      <div class="step-desc">If the model tries to answer a "current/latest" question from memory without searching, the harness forces a retry through <code class="inline">web_search</code>.</div>
+
+    <div class="pipeline">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">System Prompt Injection</div>
+        <div class="step-desc">Tool schemas auto-generated from function signatures and docstrings, injected into the system prompt at startup.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Streaming Response</div>
+        <div class="step-desc">Ollama streams NDJSON token-by-token. StreamPrinter suppresses <code class="inline">tool:</code> lines live so the user only sees the answer.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Tool Execution</div>
+        <div class="step-desc">Parser extracts tool calls from accumulated text, executes via the decorator-based registry, feeds results back.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Forced Search</div>
+        <div class="step-desc">If the model tries to answer a "current/latest" question from memory without searching, the harness forces a retry through <code class="inline">web_search</code>.</div>
+      </div>
+    </div>
+
+    <!-- 03 — The Code -->
+    <div class="section-heading">03 — The Code</div>
+
+    <h3>Agent Loop</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="filename">loki.py</span>
+        <span class="lang">Python</span>
+      </div>
+      <pre><code><span class="comment"># Simplified core loop — the full version handles</span>
+  <span class="comment"># streaming, thinking-block suppression, and retries</span>
+
+  <span class="keyword">from</span> llm <span class="keyword">import</span> chat_stream
+  <span class="keyword">from</span> tool_parser <span class="keyword">import</span> extract_tool_calls
+  <span class="keyword">from</span> tool_registry <span class="keyword">import</span> execute_tool
+  <span class="keyword">from</span> system_prompt <span class="keyword">import</span> build_system_prompt
+
+  history = []
+  system = build_system_prompt()  <span class="comment"># personality + tool schemas</span>
+
+  <span class="keyword">while</span> <span class="keyword">True</span>:
+      user_input = <span class="func">input</span>(<span class="string">"You: "</span>)
+      history.append({<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_input})
+
+      <span class="comment"># Stream the response, printing tokens live</span>
+      response = chat_stream(system, history)
+
+      <span class="comment"># Check for tool calls in the response</span>
+      tool_calls = extract_tool_calls(response)
+
+      <span class="keyword">if</span> tool_calls:
+          <span class="keyword">for</span> call <span class="keyword">in</span> tool_calls:
+              result = execute_tool(call.name, call.args)
+              <span class="comment"># Feed result back and let the model answer</span>
+              history.append({
+                  <span class="string">"role"</span>: <span class="string">"assistant"</span>,
+                  <span class="string">"content"</span>: <span class="func">format_tool_result</span>(call, result)
+              })
+              response = chat_stream(system, history)
+
+      history.append({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: response})</code></pre>
+    </div>
+
+    <h3>Tool Registration — Drop a File, Get a Tool</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="filename">tools/web_search.py</span>
+        <span class="lang">Python</span>
+      </div>
+      <pre><code><span class="keyword">from</span> typing <span class="keyword">import</span> Any, Dict
+  <span class="keyword">from</span> tool_registry <span class="keyword">import</span> register_tool
+  <span class="keyword">from</span> ddgs <span class="keyword">import</span> DDGS
+
+  <span class="keyword">@register_tool</span>(<span class="string">"web_search"</span>)
+  <span class="keyword">def</span> <span class="func">web_search</span>(query: str) -> Dict[str, Any]:
+      <span class="string">"""Search the web and return top results.
+      :param query: The search query string.
+      :return: A dict with search results.
+      """</span>
+      results = DDGS().text(query, max_results=<span class="string">3</span>)
+      <span class="keyword">return</span> {<span class="string">"results"</span>: results}</code></pre>
+    </div>
+
+    <div class="callout tip">
+      <div class="icon">💡</div>
+      <div class="body">
+        That's all it takes. Drop a <code class="inline">.py</code> file in <code class="inline">tools/</code>, decorate the function with <code class="inline">@register_tool</code>, and restart Loki. The schema generator reads the docstring for the description and the type annotations for parameter shapes. Auto-discovered via <code class="inline">pkgutil.iter_modules</code>.
+      </div>
+    </div>
+
+    <h3>StreamPrinter — Live Token Suppression</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="filename">loki.py — StreamPrinter</span>
+        <span class="lang">Python</span>
+      </div>
+      <pre><code><span class="comment"># StreamPrinter is a state machine that:</span>
+  <span class="comment"># • Holds the first ~5 chars of every new line</span>
+  <span class="comment"># • Decides "tool line vs prose"</span>
+  <span class="comment"># • Suppresses any line whose prefix is "tool:"</span>
+  <span class="comment"># • Eats &lt;think&gt;...&lt;/think&gt; spans (rolling tail buffer)</span>
+  <span class="comment"># • Emits the "Loki:" prefix lazily — a tool-only</span>
+  <span class="comment">#   reply leaves no orphan label</span>
+
+  <span class="keyword">class</span> <span class="func">StreamPrinter</span>:
+      <span class="keyword">def</span> <span class="func">__init__</span>(self):
+          self.line_buffer = <span class="string">""</span>
+          self.suppressing = <span class="keyword">False</span>
+          self.label_emitted = <span class="keyword">False</span>
+          self.think_depth = <span class="string">0</span>
+
+      <span class="keyword">def</span> <span class="func">feed</span>(self, token: str):
+          <span class="keyword">for</span> ch <span class="keyword">in</span> token:
+              <span class="keyword">if</span> ch == <span class="string">'\n'</span>:
+                  self._flush_line()
+                  self.line_buffer = <span class="string">""</span>
+                  self.suppressing = <span class="keyword">False</span>
+              <span class="keyword">else</span>:
+                  self.line_buffer += ch
+                  <span class="keyword">if</span> <span class="func">len</span>(self.line_buffer) == <span class="string">5</span>:
+                      self._decide()
+
+      <span class="keyword">def</span> <span class="func">_decide</span>(self):
+          <span class="keyword">if</span> self.line_buffer.strip().lower().startswith(<span class="string">"tool:"</span>):
+              self.suppressing = <span class="keyword">True</span>
+          <span class="keyword">else</span>:
+              <span class="keyword">if not</span> self.label_emitted:
+                  <span class="func">print</span>(<span class="string">"Loki: "</span>, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)
+                  self.label_emitted = <span class="keyword">True</span>
+              <span class="func">print</span>(self.line_buffer, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)</code></pre>
+    </div>
+
+    <!-- 04 — Built-in Tools -->
+    <div class="section-heading">04 — Built-in Tools</div>
+
+    <table class="info-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>read_file</code></td>
+          <td>Reads a file and returns its contents</td>
+        </tr>
+        <tr>
+          <td><code>list_files</code></td>
+          <td>Lists files and directories in a path</td>
+        </tr>
+        <tr>
+          <td><code>edit_file</code></td>
+          <td>Creates new files or does find-and-replace edits</td>
+        </tr>
+        <tr>
+          <td><code>web_search</code></td>
+          <td>Searches the web via DDGS — no API key, aggregates DuckDuckGo, Bing, Google</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="prose">
+      <p>Adding a new tool is a one-file operation. Drop a Python file in <code class="inline">tools/</code> with a <code class="inline">@register_tool</code> decorator — no imports to update, no config to edit. On restart, <code class="inline">pkgutil.iter_modules</code> discovers it, the schema generator reads the function signature, and it's injected into the system prompt.</p>
+    </div>
+
+    <!-- 05 — Demo -->
+    <div class="section-heading">05 — Demo</div>
+
+    <div class="output-block">
+      <div class="output-header">Terminal session</div>
+      <pre>
+               .
+              / \
+     |\      /   \      /|
+     \ \    /     \    / /
+      \ \  /       \  / /
+       \ \/    _    \/ /    ╔══════════════════════════════════╗
+        \__   / \   __/     ║           L O K I                ║
+           |  \_/  |        ║   Calculated. Precise. AI.       ║
+           \_______/        ╚══════════════════════════════════╝
+
+  You: what is the latest stable python version
+    <span style="color:var(--muted)">[ web_search ] searching the web for: "latest stable python version"</span>
+    <span style="color:var(--muted)">[ web_search ] got 3 results</span>
+       1. Download Python | Python.org
+          https://www.python.org/downloads/
+       2. Python Latest Version - Release History
+          https://versionlog.com/python/
+       3. The Latest Version of Python | phoenixNAP
+          https://phoenixnap.com/kb/latest-python-version
+  Loki: According to python.org, the latest stable version is Python 3.14.
+      </pre>
+    </div>
+
+    <div class="callout tip">
+      <div class="icon">💡</div>
+      <div class="body">
+        Notice the model didn't try to answer from memory — the harness forces a <code class="inline">web_search</code> for any "current/latest/today" question. The user sees the search happen in real-time, then gets a grounded answer citing the source. The raw <code class="inline">tool:</code> protocol line is suppressed; only the human-readable search log shows.
+      </div>
+    </div>
+
+    <!-- 06 — Personality & Guardrails -->
+    <div class="section-heading">06 — Personality &amp; Guardrails</div>
+    <div class="prose">
+      <p>Loki's personality is defined in <code class="inline">system_prompt.py</code> and enforced at the harness level:</p>
+      <p><strong>Mandatory search</strong> — for anything current, recent, or version-dated, Loki must call <code class="inline">web_search</code> before answering. If it doesn't, the harness detects it and forces a retry.</p>
+      <p><strong>Grounded</strong> — when search results are present, Loki answers only from the snippets, citing the source URL.</p>
+      <p><strong>Opinionated</strong> — picks a side when asked "X or Y"; doesn't hedge with "it depends on your use case."</p>
+      <p><strong>Honest</strong> — says "I don't know" when it doesn't. Prefixes guesses with <code class="inline">guess:</code>.</p>
+      <p><strong>Plain</strong> — short answers, no markdown theater, no preamble or postamble.</p>
+    </div>
+
+    <!-- 07 — Configuration -->
+    <div class="section-heading">07 — Configuration</div>
+
+    <table class="info-table">
+      <thead>
+        <tr>
+          <th>Setting</th>
+          <th>Default</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>MODEL_NAME</code></td>
+          <td><code>loki</code></td>
+          <td>Ollama model tag</td>
+        </tr>
+        <tr>
+          <td><code>TEMPERATURE</code></td>
+          <td><code>0.7</code></td>
+          <td>Response randomness</td>
+        </tr>
+        <tr>
+          <td><code>TOP_P</code></td>
+          <td><code>0.9</code></td>
+          <td>Nucleus sampling threshold</td>
+        </tr>
+        <tr>
+          <td><code>NUM_CTX</code></td>
+          <td><code>8192</code></td>
+          <td>Context window size</td>
+        </tr>
+        <tr>
+          <td><code>ALLOW_THINKING</code></td>
+          <td><code>False</code></td>
+          <td>Send think blocks to Ollama; stripped from display either way</td>
+        </tr>
+        <tr>
+          <td><code>TOOL_CALL_PREFIX</code></td>
+          <td><code>tool:</code></td>
+          <td>Line prefix the model uses to call tools</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="prose">
+      <p>The <code class="inline">Modelfile</code> carries the same temperature, top_p, and num_ctx values. The default brain is <code class="inline">qwen2.5-7B-instruct</code>, but the harness is model-agnostic — swap the <code class="inline">FROM</code> line in the Modelfile and rebuild.</p>
+    </div>
+
+    <!-- 08 — Quick Start -->
+    <div class="section-heading">08 — Quick Start</div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="filename">setup</span>
+        <span class="lang">bash</span>
+      </div>
+      <pre><code><span class="comment"># Prerequisites: Python 3.9+, Ollama installed and running</span>
+  <span class="comment"># Pull the base model</span>
+  ollama pull qcwind/qwen2.5-7B-instruct-Q4_K_M
+
+  <span class="comment"># Clone & install</span>
+  git clone https://github.com/0bsh3ll/loki.git && cd loki
+  pip install -r requirements.txt
+
+  <span class="comment"># Build the Loki model in Ollama</span>
+  ollama create loki -f Modelfile
+
+  <span class="comment"># Run tests (no Ollama needed — 139 tests)</span>
+  python tests/test_tools.py
+
+  <span class="comment"># Launch</span>
+  python loki.py</code></pre>
+    </div>
+
+    <div class="callout info">
+      <div class="icon">ℹ️</div>
+      <div class="body">
+        Total dependencies: <code class="inline">requests</code> and <code class="inline">ddgs</code>. Everything else is Python standard library. No frameworks, no langchain, no vector databases. The entire agent loop is ~200 lines.
+      </div>
+    </div>
+
+    <!-- 09 — Project Structure -->
+    <div class="section-heading">09 — Project Structure</div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="filename">loki/</span>
+        <span class="lang">tree</span>
+      </div>
+      <pre><code>loki/
+  ├── loki.py              <span class="comment"># Entry point — agent loop + StreamPrinter</span>
+  ├── config.py            <span class="comment"># All constants (model, colors, ctx size)</span>
+  ├── system_prompt.py     <span class="comment"># Personality + dynamic tool schema injection</span>
+  ├── llm.py               <span class="comment"># Ollama API wrapper (streaming + non-streaming)</span>
+  ├── tool_registry.py     <span class="comment"># Decorator-based tool registration</span>
+  ├── tool_parser.py       <span class="comment"># Extracts tool calls from LLM text</span>
+  ├── spinner.py           <span class="comment"># Stderr spinner for time-to-first-token</span>
+  ├── Modelfile            <span class="comment"># Ollama model definition</span>
+  ├── requirements.txt
+  ├── tools/
+  │   ├── __init__.py      <span class="comment"># Auto-discovers every .py in this folder</span>
+  │   ├── read_file.py
+  │   ├── list_files.py
+  │   ├── edit_file.py
+  │   └── web_search.py
+  └── tests/
+      └── test_tools.py    <span class="comment"># 139 tests — no Ollama required</span></code></pre>
+    </div>
+
+    <!-- 10 — Limitations & Next Steps -->
+    <div class="section-heading">10 — Limitations &amp; What's Next</div>
+    <div class="prose">
+      <p>The biggest limitation is the 7B model itself — it's fast and private but it hallucinates on complex multi-step reasoning. The harness mitigates this for factual queries (forced search + grounding), but it can't fix reasoning failures. Bigger models (13B, 70B) through Ollama are a drop-in upgrade if you have the hardware.</p>
+      <p>There's no sandboxing — a tool can touch anywhere the process can. The <code class="inline">edit_file</code> tool in particular has no guardrails beyond the model's judgment. For now this is intentional (it's a local tool for local use), but a confirmation step before destructive actions is the obvious next feature.</p>
+      <p>No multi-modal support yet. Images, PDFs, and audio are all on the roadmap once Ollama's vision model support stabilizes.</p>
+    </div>
+
+    <div class="callout warn">
+      <div class="icon">⚠️</div>
+      <div class="body">
+        There is no sandboxing. Tools execute with the same permissions as the Python process. Don't point Loki at directories you can't afford to have modified by a 7B model with opinions.
+      </div>
+    </div>
+
+    <div class="article-tags">
+      <span>ai</span><span>automation</span><span>ollama</span><span>python</span><span>local llm</span><span>agent</span><span>cli</span>
+    </div>
+
+    <div class="post-nav">
+      <span></span>
+      <a href="../certs/grem-self-study.html" style="text-align:right"><span class="nav-label">Next →</span><span class="nav-title">How I Passed GREM in a Month</span></a>
     </div>
   </div>
 
-  <!-- 03 — The Code -->
-  <h2 class="section-heading"><span class="num">03</span> — The Code</h2>
-
-  <h3 style="font-size:.95rem;color:var(--heading);margin-bottom:.75rem">Agent Loop</h3>
-  <div class="code-block">
-    <div class="code-header">
-      <span class="filename">loki.py</span>
-      <span class="lang">Python</span>
-    </div>
-    <pre><code><span class="comment"># Simplified core loop — the full version handles</span>
-<span class="comment"># streaming, thinking-block suppression, and retries</span>
-
-<span class="keyword">from</span> llm <span class="keyword">import</span> chat_stream
-<span class="keyword">from</span> tool_parser <span class="keyword">import</span> extract_tool_calls
-<span class="keyword">from</span> tool_registry <span class="keyword">import</span> execute_tool
-<span class="keyword">from</span> system_prompt <span class="keyword">import</span> build_system_prompt
-
-history = []
-system = build_system_prompt()  <span class="comment"># personality + tool schemas</span>
-
-<span class="keyword">while</span> <span class="keyword">True</span>:
-    user_input = <span class="func">input</span>(<span class="string">"You: "</span>)
-    history.append({<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_input})
-
-    <span class="comment"># Stream the response, printing tokens live</span>
-    response = chat_stream(system, history)
-
-    <span class="comment"># Check for tool calls in the response</span>
-    tool_calls = extract_tool_calls(response)
-
-    <span class="keyword">if</span> tool_calls:
-        <span class="keyword">for</span> call <span class="keyword">in</span> tool_calls:
-            result = execute_tool(call.name, call.args)
-            <span class="comment"># Feed result back and let the model answer</span>
-            history.append({
-                <span class="string">"role"</span>: <span class="string">"assistant"</span>,
-                <span class="string">"content"</span>: <span class="func">format_tool_result</span>(call, result)
-            })
-            response = chat_stream(system, history)
-
-    history.append({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: response})</code></pre>
-  </div>
-
-  <h3 style="font-size:.95rem;color:var(--heading);margin-bottom:.75rem">Tool Registration — Drop a File, Get a Tool</h3>
-  <div class="code-block">
-    <div class="code-header">
-      <span class="filename">tools/web_search.py</span>
-      <span class="lang">Python</span>
-    </div>
-    <pre><code><span class="keyword">from</span> typing <span class="keyword">import</span> Any, Dict
-<span class="keyword">from</span> tool_registry <span class="keyword">import</span> register_tool
-<span class="keyword">from</span> ddgs <span class="keyword">import</span> DDGS
-
-<span class="keyword">@register_tool</span>(<span class="string">"web_search"</span>)
-<span class="keyword">def</span> <span class="func">web_search</span>(query: str) -> Dict[str, Any]:
-    <span class="string">"""Search the web and return top results.
-    :param query: The search query string.
-    :return: A dict with search results.
-    """</span>
-    results = DDGS().text(query, max_results=<span class="string">3</span>)
-    <span class="keyword">return</span> {<span class="string">"results"</span>: results}</code></pre>
-  </div>
-
-  <div class="callout tip">
-    <div class="icon">💡</div>
-    <div class="body">
-      That's all it takes. Drop a <code class="inline">.py</code> file in <code class="inline">tools/</code>, decorate the function with <code class="inline">@register_tool</code>, and restart Loki. The schema generator reads the docstring for the description and the type annotations for parameter shapes. Auto-discovered via <code class="inline">pkgutil.iter_modules</code>.
-    </div>
-  </div>
-
-  <h3 style="font-size:.95rem;color:var(--heading);margin-bottom:.75rem">StreamPrinter — Live Token Suppression</h3>
-  <div class="code-block">
-    <div class="code-header">
-      <span class="filename">loki.py — StreamPrinter</span>
-      <span class="lang">Python</span>
-    </div>
-    <pre><code><span class="comment"># StreamPrinter is a state machine that:</span>
-<span class="comment"># • Holds the first ~5 chars of every new line</span>
-<span class="comment"># • Decides "tool line vs prose"</span>
-<span class="comment"># • Suppresses any line whose prefix is "tool:"</span>
-<span class="comment"># • Eats &lt;think&gt;...&lt;/think&gt; spans (rolling tail buffer)</span>
-<span class="comment"># • Emits the "Loki:" prefix lazily — a tool-only</span>
-<span class="comment">#   reply leaves no orphan label</span>
-
-<span class="keyword">class</span> <span class="func">StreamPrinter</span>:
-    <span class="keyword">def</span> <span class="func">__init__</span>(self):
-        self.line_buffer = <span class="string">""</span>
-        self.suppressing = <span class="keyword">False</span>
-        self.label_emitted = <span class="keyword">False</span>
-        self.think_depth = <span class="string">0</span>
-
-    <span class="keyword">def</span> <span class="func">feed</span>(self, token: str):
-        <span class="keyword">for</span> ch <span class="keyword">in</span> token:
-            <span class="keyword">if</span> ch == <span class="string">'\n'</span>:
-                self._flush_line()
-                self.line_buffer = <span class="string">""</span>
-                self.suppressing = <span class="keyword">False</span>
-            <span class="keyword">else</span>:
-                self.line_buffer += ch
-                <span class="keyword">if</span> <span class="func">len</span>(self.line_buffer) == <span class="string">5</span>:
-                    self._decide()
-
-    <span class="keyword">def</span> <span class="func">_decide</span>(self):
-        <span class="keyword">if</span> self.line_buffer.strip().lower().startswith(<span class="string">"tool:"</span>):
-            self.suppressing = <span class="keyword">True</span>
-        <span class="keyword">else</span>:
-            <span class="keyword">if not</span> self.label_emitted:
-                <span class="func">print</span>(<span class="string">"Loki: "</span>, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)
-                self.label_emitted = <span class="keyword">True</span>
-            <span class="func">print</span>(self.line_buffer, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)</code></pre>
-  </div>
-
-  <!-- 04 — Built-in Tools -->
-  <h2 class="section-heading"><span class="num">04</span> — Built-in Tools</h2>
-
-  <table class="info-table">
-    <thead>
-      <tr>
-        <th>Tool</th>
-        <th>What it does</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><code>read_file</code></td>
-        <td>Reads a file and returns its contents</td>
-      </tr>
-      <tr>
-        <td><code>list_files</code></td>
-        <td>Lists files and directories in a path</td>
-      </tr>
-      <tr>
-        <td><code>edit_file</code></td>
-        <td>Creates new files or does find-and-replace edits</td>
-      </tr>
-      <tr>
-        <td><code>web_search</code></td>
-        <td>Searches the web via DDGS — no API key, aggregates DuckDuckGo, Bing, Google</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="prose">
-    <p>Adding a new tool is a one-file operation. Drop a Python file in <code class="inline">tools/</code> with a <code class="inline">@register_tool</code> decorator — no imports to update, no config to edit. On restart, <code class="inline">pkgutil.iter_modules</code> discovers it, the schema generator reads the function signature, and it's injected into the system prompt.</p>
-  </div>
-
-  <!-- 05 — Demo -->
-  <h2 class="section-heading"><span class="num">05</span> — Demo</h2>
-
-  <div class="output-block">
-    <div class="output-header">Terminal session</div>
-    <pre>
-             .
-            / \
-   |\      /   \      /|
-   \ \    /     \    / /
-    \ \  /       \  / /
-     \ \/    _    \/ /    ╔══════════════════════════════════╗
-      \__   / \   __/     ║           L O K I                ║
-         |  \_/  |        ║   Calculated. Precise. AI.       ║
-         \_______/        ╚══════════════════════════════════╝
-
-You: what is the latest stable python version
-  <span style="color:var(--text-dim)">[ web_search ] searching the web for: "latest stable python version"</span>
-  <span style="color:var(--text-dim)">[ web_search ] got 3 results</span>
-     1. Download Python | Python.org
-        https://www.python.org/downloads/
-     2. Python Latest Version - Release History
-        https://versionlog.com/python/
-     3. The Latest Version of Python | phoenixNAP
-        https://phoenixnap.com/kb/latest-python-version
-Loki: According to python.org, the latest stable version is Python 3.14.
-    </pre>
-  </div>
-
-  <div class="callout tip">
-    <div class="icon">💡</div>
-    <div class="body">
-      Notice the model didn't try to answer from memory — the harness forces a <code class="inline">web_search</code> for any "current/latest/today" question. The user sees the search happen in real-time, then gets a grounded answer citing the source. The raw <code class="inline">tool:</code> protocol line is suppressed; only the human-readable search log shows.
-    </div>
-  </div>
-
-  <!-- 06 — Personality & Guardrails -->
-  <h2 class="section-heading"><span class="num">06</span> — Personality &amp; Guardrails</h2>
-  <div class="prose">
-    <p>Loki's personality is defined in <code class="inline">system_prompt.py</code> and enforced at the harness level:</p>
-    <p><strong>Mandatory search</strong> — for anything current, recent, or version-dated, Loki must call <code class="inline">web_search</code> before answering. If it doesn't, the harness detects it and forces a retry.</p>
-    <p><strong>Grounded</strong> — when search results are present, Loki answers only from the snippets, citing the source URL.</p>
-    <p><strong>Opinionated</strong> — picks a side when asked "X or Y"; doesn't hedge with "it depends on your use case."</p>
-    <p><strong>Honest</strong> — says "I don't know" when it doesn't. Prefixes guesses with <code class="inline">guess:</code>.</p>
-    <p><strong>Plain</strong> — short answers, no markdown theater, no preamble or postamble.</p>
-  </div>
-
-  <!-- 07 — Configuration -->
-  <h2 class="section-heading"><span class="num">07</span> — Configuration</h2>
-
-  <table class="info-table">
-    <thead>
-      <tr>
-        <th>Setting</th>
-        <th>Default</th>
-        <th>What it does</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><code>MODEL_NAME</code></td>
-        <td><code>loki</code></td>
-        <td>Ollama model tag</td>
-      </tr>
-      <tr>
-        <td><code>TEMPERATURE</code></td>
-        <td><code>0.7</code></td>
-        <td>Response randomness</td>
-      </tr>
-      <tr>
-        <td><code>TOP_P</code></td>
-        <td><code>0.9</code></td>
-        <td>Nucleus sampling threshold</td>
-      </tr>
-      <tr>
-        <td><code>NUM_CTX</code></td>
-        <td><code>8192</code></td>
-        <td>Context window size</td>
-      </tr>
-      <tr>
-        <td><code>ALLOW_THINKING</code></td>
-        <td><code>False</code></td>
-        <td>Send think blocks to Ollama; stripped from display either way</td>
-      </tr>
-      <tr>
-        <td><code>TOOL_CALL_PREFIX</code></td>
-        <td><code>tool:</code></td>
-        <td>Line prefix the model uses to call tools</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="prose">
-    <p>The <code class="inline">Modelfile</code> carries the same temperature, top_p, and num_ctx values. The default brain is <code class="inline">qwen2.5-7B-instruct</code>, but the harness is model-agnostic — swap the <code class="inline">FROM</code> line in the Modelfile and rebuild.</p>
-  </div>
-
-  <!-- 08 — Quick Start -->
-  <h2 class="section-heading"><span class="num">08</span> — Quick Start</h2>
-
-  <div class="code-block">
-    <div class="code-header">
-      <span class="filename">setup</span>
-      <span class="lang">bash</span>
-    </div>
-    <pre><code><span class="comment"># Prerequisites: Python 3.9+, Ollama installed and running</span>
-<span class="comment"># Pull the base model</span>
-ollama pull qcwind/qwen2.5-7B-instruct-Q4_K_M
-
-<span class="comment"># Clone & install</span>
-git clone https://github.com/0bsh3ll/loki.git && cd loki
-pip install -r requirements.txt
-
-<span class="comment"># Build the Loki model in Ollama</span>
-ollama create loki -f Modelfile
-
-<span class="comment"># Run tests (no Ollama needed — 139 tests)</span>
-python tests/test_tools.py
-
-<span class="comment"># Launch</span>
-python loki.py</code></pre>
-  </div>
-
-  <div class="callout info">
-    <div class="icon">ℹ️</div>
-    <div class="body">
-      Total dependencies: <code class="inline">requests</code> and <code class="inline">ddgs</code>. Everything else is Python standard library. No frameworks, no langchain, no vector databases. The entire agent loop is ~200 lines.
-    </div>
-  </div>
-
-  <!-- 09 — Project Structure -->
-  <h2 class="section-heading"><span class="num">09</span> — Project Structure</h2>
-
-  <div class="code-block">
-    <div class="code-header">
-      <span class="filename">loki/</span>
-      <span class="lang">tree</span>
-    </div>
-    <pre><code>loki/
-├── loki.py              <span class="comment"># Entry point — agent loop + StreamPrinter</span>
-├── config.py            <span class="comment"># All constants (model, colors, ctx size)</span>
-├── system_prompt.py     <span class="comment"># Personality + dynamic tool schema injection</span>
-├── llm.py               <span class="comment"># Ollama API wrapper (streaming + non-streaming)</span>
-├── tool_registry.py     <span class="comment"># Decorator-based tool registration</span>
-├── tool_parser.py       <span class="comment"># Extracts tool calls from LLM text</span>
-├── spinner.py           <span class="comment"># Stderr spinner for time-to-first-token</span>
-├── Modelfile            <span class="comment"># Ollama model definition</span>
-├── requirements.txt
-├── tools/
-│   ├── __init__.py      <span class="comment"># Auto-discovers every .py in this folder</span>
-│   ├── read_file.py
-│   ├── list_files.py
-│   ├── edit_file.py
-│   └── web_search.py
-└── tests/
-    └── test_tools.py    <span class="comment"># 139 tests — no Ollama required</span></code></pre>
-  </div>
-
-  <!-- 10 — Limitations & Next Steps -->
-  <h2 class="section-heading"><span class="num">10</span> — Limitations &amp; What's Next</h2>
-  <div class="prose">
-    <p>The biggest limitation is the 7B model itself — it's fast and private but it hallucinates on complex multi-step reasoning. The harness mitigates this for factual queries (forced search + grounding), but it can't fix reasoning failures. Bigger models (13B, 70B) through Ollama are a drop-in upgrade if you have the hardware.</p>
-    <p>There's no sandboxing — a tool can touch anywhere the process can. The <code class="inline">edit_file</code> tool in particular has no guardrails beyond the model's judgment. For now this is intentional (it's a local tool for local use), but a confirmation step before destructive actions is the obvious next feature.</p>
-    <p>No multi-modal support yet. Images, PDFs, and audio are all on the roadmap once Ollama's vision model support stabilizes.</p>
-  </div>
-
-  <div class="callout warn">
-    <div class="icon">⚠️</div>
-    <div class="body">
-      There is no sandboxing. Tools execute with the same permissions as the Python process. Don't point Loki at directories you can't afford to have modified by a 7B model with opinions.
-    </div>
-  </div>
-
-  <!-- tags -->
-  <div class="tags">
-    <span>ai</span>
-    <span>automation</span>
-    <span>ollama</span>
-    <span>python</span>
-    <span>local llm</span>
-    <span>agent</span>
-    <span>cli</span>
-  </div>
-
-  <!-- prev / next -->
-  <div class="post-nav">
-    <span></span>
-    <a href="https://0bsh3ll.github.io/certs/grem-self-study.html" style="text-align:right">Next →<br>How I Passed GREM in a Month</a>
-  </div>
-
-  <!-- footer -->
-  <div class="footer">
-    // All content for educational &amp; research purposes only.<br><br>
-    <a href="https://github.com/0bsh3ll" target="_blank">GitHub</a> · 
-    <a href="https://www.linkedin.com/in/0bsh3ll/" target="_blank">LinkedIn</a>
-  </div>
-
-</div>
-
+  <script>
+    const root=document.documentElement,ti=document.getElementById('ti');
+    if(localStorage.getItem('theme')==='light'){root.classList.add('light');ti.textContent='🌙';}
+    function toggleTheme(){const l=root.classList.toggle('light');ti.textContent=l?'🌙':'☀️';localStorage.setItem('theme',l?'light':'dark');}
+  </script>
 </body>
 </html>

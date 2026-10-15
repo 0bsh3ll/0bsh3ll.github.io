@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>0bsh3ll — Malware · RE · AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <style>
     /* ── DARK MODE (default) ── */
     :root {
@@ -24,7 +24,8 @@
       --grid-line: rgba(124,108,240,0.03);
       --mark-bg: #7c6cf0;
       --mark-text: #0b0d10;
-      --sans: 'Syne', sans-serif;
+      --sans: 'Open Sans', sans-serif;
+      --display: 'Syne', sans-serif;
     }
 
     /* ── LIGHT MODE ── */
@@ -127,7 +128,7 @@
       .hero-visual { max-width: 200px; }
     }
     .hero-label {
-      font-family: var(--sans); font-size: 0.7rem;
+      font-family: var(--display); font-size: 0.7rem;
       color: var(--accent); letter-spacing: 4px;
       text-transform: uppercase; margin-bottom: 1.5rem;
       display: flex; align-items: center; gap: 0.5rem;
@@ -135,6 +136,7 @@
     }
     .hero-label::before { content: ''; width: 20px; height: 1px; background: var(--accent); transition: background 0.3s ease; }
     h1 {
+      font-family: var(--display);
       font-size: clamp(2.5rem, 6vw, 4.5rem);
       font-weight: 800; line-height: 1.05;
       letter-spacing: -1px; color: var(--heading);
@@ -268,9 +270,9 @@
 
     /* ── EMPTY STATE ── */
     .empty-state {
-      font-family: var(--sans); font-size: 0.8rem;
-      color: var(--muted); padding: 4rem 0;
-      text-align: center; letter-spacing: 2px; display: none;
+      font-family: var(--sans); font-size: 0.95rem;
+      color: var(--muted); padding: 4rem 1rem;
+      text-align: center; line-height: 1.7; display: none;
     }
 
     /* ── FOOTER ── */
@@ -407,7 +409,7 @@
       <div class="post-arrow">→</div>
     </a>
 {% endfor %}
-    <div class="empty-state" id="empty">// no posts match this filter yet</div>
+    <div class="empty-state" id="empty"></div>
 
   </section>
 
@@ -487,8 +489,24 @@
       } else {
         countEl.textContent = '';
       }
-      document.getElementById('empty').style.display = visible === 0 ? 'block' : 'none';
+      const emptyEl = document.getElementById('empty');
+      if (visible === 0) emptyEl.textContent = query ? EMPTY_SEARCH : (EMPTY_MESSAGES[activeTag] || EMPTY_DEFAULT);
+      emptyEl.style.display = visible === 0 ? 'block' : 'none';
     }
+
+    // ── EMPTY STATES ──
+    const EMPTY_MESSAGES = {
+      malware:  '💣 Nothing here yet. The samples are still detonating in the sandbox.',
+      re:       '🐞 Still single-stepping through this one in x64dbg. Hit F9 and check back later.',
+      ai:       '🤖 The AI is still thinking. Probably hallucinating a post as we speak.',
+      lab:      '🧪 The lab is reverting to a clean snapshot. Please hold.',
+      research: '📚 Research in progress: 47 browser tabs open, 0 conclusions.',
+      cool:     '🐇 Nothing cool yet. Still climbing out of the last rabbit hole.',
+      scripts:  '📜 No scripts yet. They\'re all still called test_final_v2_REAL.py.',
+      certs:    '🎓 Still studying. The index is only 40 pages so far.',
+    };
+    const EMPTY_DEFAULT = '🐈 The cat sat on the keyboard and deleted everything. Check back soon.';
+    const EMPTY_SEARCH  = '🔍 No results. Either this query is packed with UPX, or it doesn\'t exist yet.';
 
     function filterPosts(tag, btn) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
