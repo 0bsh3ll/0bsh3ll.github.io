@@ -37,8 +37,8 @@
     h3{font-size:1.05rem;font-weight:700;color:var(--post-title);margin:2rem 0 0.8rem;}
     .prose p{font-size:0.95rem;color:var(--text);line-height:1.85;margin-bottom:1.2rem;}
     .prose strong{color:var(--heading);}
-    .article-summary a,.prose a{color:var(--category);text-decoration:underline;text-underline-offset:3px;}
-    .article-summary a:hover,.prose a:hover{color:var(--accent);}
+    .article-summary a,.prose a,.spec-value a{color:var(--category);text-decoration:underline;text-underline-offset:3px;}
+    .article-summary a:hover,.prose a:hover,.spec-value a:hover{color:var(--accent);}
     .pipeline{display:grid;grid-template-columns:1fr 1fr;gap:1px;border:1px solid var(--border);background:var(--border);margin:1.5rem 0 2rem;}
     .step{background:var(--surface);padding:1.2rem;}
     .step-num{font-size:0.7rem;font-weight:700;letter-spacing:1px;color:var(--category);margin-bottom:0.35rem;}
@@ -98,7 +98,7 @@
     </div>
     <div class="article-summary">
       A zero-install browser tool that turns a Process Monitor CSV export into an interactive, filterable graph. Process trees, file, registry and network activity, and color-coded severity rings, in the dark-dashboard look of Microsoft Defender's blast radius view. Inspired by ProcDOT. Open <code class="inline">index.html</code> in a browser, import a CSV, and start reading behavior instead of rows.
-      <a href="https://github.com/0bsh3ll/malmap" target="_blank" rel="noopener">MalMap source on GitHub ↗</a>
+      <a href="https://0bsh3ll.github.io/malmap/" target="_blank" rel="noopener"><b>▶ Try MalMap live ↗</b></a> · <a href="https://github.com/0bsh3ll/malmap" target="_blank" rel="noopener">MalMap source on GitHub ↗</a>
     </div>
   </div>
 
@@ -109,7 +109,7 @@
       <div class="spec-item"><div class="spec-label">Icons</div><div class="spec-value">Lucide</div></div>
       <div class="spec-item"><div class="spec-label">Input</div><div class="spec-value">ProcMon CSV</div></div>
       <div class="spec-item"><div class="spec-label">Build Step</div><div class="spec-value">None</div></div>
-      <div class="spec-item"><div class="spec-label">Install</div><div class="spec-value">Open index.html</div></div>
+      <div class="spec-item"><div class="spec-label">Access</div><div class="spec-value"><a href="https://0bsh3ll.github.io/malmap/" target="_blank" rel="noopener">Try here ↗</a></div></div>
     </div>
   </div>
 
@@ -194,6 +194,7 @@
 
     <!-- 04 — Quick Start -->
     <div class="section-heading">04 — Quick Start</div>
+    <div class="prose"><p>Or skip the setup and <a href="https://0bsh3ll.github.io/malmap/" target="_blank" rel="noopener">open the live version</a>. Your CSV is parsed locally in your browser and never uploaded.</p></div>
 
     <div class="code-block">
       <div class="code-header">
