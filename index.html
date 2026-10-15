@@ -233,6 +233,7 @@
     .tag-cool     { color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
     .tag-scripts  { color: #67e8f9; border: 1px solid rgba(103,232,249,0.3); }
     .tag-certs    { color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
+    .tag-tools    { color: #a3e635; border: 1px solid rgba(163,230,53,0.3); }
 
     /* light tag colors */
     .light .tag-malware  { color: #b8003a; border-color: rgba(184,0,58,0.3); }
@@ -243,6 +244,7 @@
     .light .tag-cool     { color: #c2430a; border-color: rgba(194,67,10,0.3); }
     .light .tag-scripts  { color: #0e7490; border-color: rgba(14,116,144,0.3); }
     .light .tag-certs    { color: #be185d; border-color: rgba(190,24,93,0.3); }
+    .light .tag-tools    { color: #4d7c0f; border-color: rgba(77,124,15,0.3); }
 
     .post-date { font-family: var(--sans); font-size: 0.65rem; color: var(--muted); }
     .post-title {
@@ -386,6 +388,7 @@
   <div class="filter-bar">
     <button class="filter-btn active" onclick="filterPosts('all', this)">All</button>
     <button class="filter-btn" onclick="filterPosts('ai', this)">AI &amp; Automation</button>
+    <button class="filter-btn" onclick="filterPosts('tools', this)">Tools</button>
     <button class="filter-btn" onclick="filterPosts('lab', this)">Lab Notes</button>
     <button class="filter-btn" onclick="filterPosts('research', this)">Research</button>
     <button class="filter-btn" onclick="filterPosts('scripts', this)">Scripts</button>
@@ -496,6 +499,7 @@
       research: '📚 Research in progress: 47 browser tabs open, 0 conclusions.',
       cool:     '🐇 Nothing cool yet. Still climbing out of the last rabbit hole.',
       scripts:  '📜 No scripts yet. They\'re all still called test_final_v2_REAL.py.',
+      tools:    '🛠️ No tools yet. Still yak-shaving the build script for the build script.',
       certs:    '🎓 Still studying. The index is only 40 pages so far.',
     };
     const EMPTY_DEFAULT = '🐈 The cat sat on the keyboard and deleted everything. Check back soon.';

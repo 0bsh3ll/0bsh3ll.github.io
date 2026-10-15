@@ -5,6 +5,13 @@
   excerpt: "Developer turned security analyst. One month, one course, free online resources and 2 GIAC practice tests. 56% on my first practice test → 87% on the real exam. My step-by-step method and every resource I used."
   url: "certs/grem-self-study.html"
 
+- tag: tools
+  tag_label: Tools
+  date: "2026-07-17"
+  title: "MalMap — Visualizing ProcMon Captures as a Process Graph"
+  excerpt: "A zero-install browser tool that turns ProcMon CSV exports into an interactive, filterable process graph — process trees, file/registry/network activity and severity rings, inspired by ProcDOT and Defender's blast radius."
+  url: "tools/malmap.html"
+
 - tag: ai
   tag_label: "AI &amp; Automation"
   date: "2025-04-29"

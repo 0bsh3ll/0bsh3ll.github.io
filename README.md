@@ -9,6 +9,7 @@ My personal blog on malware analysis, reverse engineering, AI and certifications
 | Category | Post |
 |---|---|
 | Certifications | [How I Passed GREM in a Month with Self-Study](https://0bsh3ll.github.io/certs/grem-self-study.html) |
+| Tools | [MalMap — Visualizing ProcMon Captures as a Process Graph](https://0bsh3ll.github.io/tools/malmap.html) |
 | AI & Automation | [Loki — A Local AI Agent That Actually Does Things](https://0bsh3ll.github.io/ai/loki.html) |
 
 ## Structure
@@ -17,7 +18,7 @@ My personal blog on malware analysis, reverse engineering, AI and certifications
 index.html          # homepage (built by Jekyll from _data/posts.yml)
 _data/posts.yml     # list of posts shown on the homepage
 _config.yml         # Jekyll config
-ai/  certs/  cool/  lab/  re/  research/  scripts/
+ai/  certs/  cool/  lab/  re/  research/  scripts/  tools/
                     # one folder per category; each has a template.html
 ```
 
